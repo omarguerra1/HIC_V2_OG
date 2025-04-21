@@ -1,0 +1,78 @@
+#root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrar verticalmente */
+  align-items: center;     /* Centrar horizontalmente */
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
+  padding: 1rem; /* Reduccion del padding para evitar desplazamiento excesivo */
+  text-align: center;
+}
+
+.upload-message {
+  margin-bottom: 20px; /* Espacio entre el mensaje y el botón */
+}
+
+.image-preview-container {
+  display: flex;
+  flex-direction: column; /* Alinear elementos en columna */
+  align-items: center; /* Centrar elementos */
+  margin-top: 20px; /* Espaciado arriba */
+}
+
+.image-preview-container img {
+  max-width: 100%; /* Asegúrate de que la imagen no desborde */
+  height: auto; /* Mantener la proporción de la imagen */
+  margin-bottom: 10px; /* Espacio entre la imagen y el botón de eliminar */
+}
+
+button {
+  padding: 20px 20px;
+  margin: 30px; /* Margen entre los botones de elegir y subir imagen*/
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: #0aaa17; /* Color del boton */
+  color: rgb(32, 138, 209);
+  border: none;
+}
+
+button:disabled {
+  background-color: #c7bebe;
+  cursor: not-allowed;
+}
+
+/* Estilo específico para el boton de eliminar, si lo deseas */
+button.remove {
+  margin-top: 10px; /* Espacio entre la imagen y el botón de eliminar */
+  background-color: #eb3d3d; /* Color del boton de eliminar */
+}
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.title {
+  margin: 10px 0;
+}
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.title {
+  margin: 10px 0;
+}

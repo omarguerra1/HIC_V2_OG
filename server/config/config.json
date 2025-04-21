@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "mr_robot",
+    "password": "admin123",
+    "database": "hic_db",
+    "host": "172.210.233.153",
+    "dialect": "mariadb"
+  },
+  "test": {
+    "username": "mr_robot",
+    "password": "admin123",
+    "database": "hic_db",
+    "host": "172.210.233.153",
+    "dialect": "mariadb"
+  },
+  "production": {
+    "username": "mr_robot",
+    "password": "admin123",
+    "database": "hic_db",
+    "host": "172.210.233.153",
+    "dialect": "mariadb"
+  }
+}

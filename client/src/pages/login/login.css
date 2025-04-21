@@ -1,0 +1,79 @@
+/* Estilo para el contenedor del formulario */
+.login-form {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.login-form h2 {
+    text-align: center;
+    color: #2f6ad8;
+    font-size: 28px;
+    padding: 70px 0 10px 0;
+}
+
+/* Estilo para los inputs de correo y contraseña */
+.login-form input[type="email"],
+.login-form input[type="password"] {
+    width: 100%; /* Asegura que ambos campos ocupen todo el ancho */
+    padding: 15px; /* Asegura un relleno consistente */
+    border: 1px solid #070b0f; /* Borde gris claro */
+    margin-bottom: 10px; /* Espaciado entre los campos */
+    box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+    background-color: #2083cf; /* Fondo azul celeste */
+    color: #000000; /* Color del texto */
+    font-size: 16px; /* Tamaño de la fuente */
+}
+
+/* Estilo para el botón de login */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background-color: rgb(76, 162, 5);
+    border: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: large;
+    color: white;
+}
+
+.btn-login:hover,
+.btn-login:active {
+    color: white;
+    background-color: #165c19;
+    border-color: #165c19;
+}
+
+.btn-login:focus {
+    box-shadow: 0 0 0 3px rgba(121, 82, 179, 0.25);
+}
+
+/* Estilo para el botón de registro */
+.btn-register {
+    width: 100%;
+    padding: 15px;
+    background-color: gray;
+    border: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    font-size: large;
+    color: rgb(31, 107, 221);
+    margin-top: 20px;
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    text-decoration: none;
+}
+
+.btn-register:hover,
+.btn-register:active {
+    color: white;
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.btn-register:focus {
+    box-shadow: 0 0 0 3px #10b981;
+}
