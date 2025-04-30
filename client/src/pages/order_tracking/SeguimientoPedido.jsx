@@ -3,7 +3,7 @@ import OrderTracking from './OrderTracking'; // Importamos el componente de Orde
 
 const SeguimientoPedido = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div className="w-full p-4">
       <OrderTracking /> {/* Reutilizamos el componente OrderTracking */}
     </div>
   );
