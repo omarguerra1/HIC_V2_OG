@@ -3,7 +3,7 @@ import axios from "axios";
 
 const Messages = () => {
 
-    const [writingMsg, setWriting] = useState(false);
+    const [writingMsg, setWriting] = useState(false);//:p
     const [sentMsgs, setSentMsgs] = useState([]);
     const [receivedMsgs, setReceivedMsgs] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
