@@ -21,7 +21,9 @@ const MessageModel = db.define("messages", {
     },
     msg_date: {
         type: DataTypes.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        //timestamps: true,
+        //defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        //defaultValue: Sequelize.literal("CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', '-06:00)"),
         allowNull: false,
     },
     hasBeenSeen: {
@@ -34,6 +36,7 @@ const MessageModel = db.define("messages", {
     },
 }, {
     timestamps: true,
+    timezone: "-06:00"
 });
 
 export default MessageModel;

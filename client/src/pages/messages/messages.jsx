@@ -137,7 +137,8 @@ const Messages = () => {
                                     <li key={msg.msg_id} className="border-b last:border-0 p-2">
                                         <p><strong>De: </strong>{currentUser.name_}</p>
                                         <p><strong>Para: </strong>Administrador</p>
-                                        <p><strong>Fecha: </strong>{msg.msg_date}</p>
+                                        <p><strong>Fecha: </strong>{new Date(msg.msg_date).toLocaleDateString("es-mx")}</p>
+                                        <p><strong>Hora: </strong>{new Date(msg.msg_date).toLocaleTimeString("es-mx")}</p>
                                         <p><strong>Mensaje: </strong>{msg.msg_content}</p>
                                         {receivedMsgs.filter(m => m.respondingTo === msg.msg_id).map(response => (
                                             <div key={response.msg_id} className="text-right">
@@ -149,7 +150,8 @@ const Messages = () => {
                                                 <strong>Respuesta: </strong>
                                                 <p><strong>De: </strong>Administrador</p>
                                                 <p><strong>Para: </strong>{currentUser.name_}</p>
-                                                <p><strong>Fecha: </strong>{response.msg_date}</p>
+                                                <p><strong>Fecha: </strong>{new Date(msg.msg_date).toLocaleDateString()}</p>
+                                                <p><strong>Hora: </strong>{new Date(msg.msg_date).toLocaleTimeString()}</p>
                                                 <p><strong>Mensaje: </strong>{response.msg_content}</p>
                                             </div>
                                         ))}
@@ -176,7 +178,8 @@ const Messages = () => {
                                         ) : null }
                                         <p><strong>De: </strong>{msg.patient_name}</p>
                                         <p><strong>Para: </strong>Administrador</p>
-                                        <p><strong>Fecha: </strong>{msg.msg_date}</p>
+                                        <p><strong>Fecha: </strong>{new Date(msg.msg_date).toLocaleDateString()}</p>
+                                        <p><strong>Hora: </strong>{new Date(msg.msg_date).toLocaleTimeString()}</p>
                                         <p><strong>Mensaje: </strong>{msg.msg_content}</p>
                                         {sentMsgs.filter(m => m.respondingTo === msg.msg_id).map(response => (
                                             <div key={response.msg_id} className="text-right">

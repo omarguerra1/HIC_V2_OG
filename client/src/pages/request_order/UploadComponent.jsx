@@ -4,6 +4,7 @@ import ProgressBar from './ProgressBar';
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
 
 const UploadComponent = () => {
+  //const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [imageUrl, setImageUrl] = useState(null);
@@ -80,6 +81,8 @@ const UploadComponent = () => {
         alert(`Receta creada con ID: ${response.data.prescription.prescription_id}\nLa orden sera revisada y creada por un administrador, revise mas tarde`);  // Aquí usamos prescription_id
         setSuccess(true);
         setImageUrl(`http://localhost:3000${response.data.prescription.image_url}`);
+        //navigate("/", { replace: true });
+        window.location.reload();
       }
       else if (response.status === 400) {
         alert("Error, la receta no pudo ser procesada");
