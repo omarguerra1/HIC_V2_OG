@@ -27,6 +27,7 @@ import VerUsuarios from "./pages/admin_pages/VerUsuarios.jsx"
 import VerOrdenes from "./pages/admin_pages/VerOrdenes.jsx"
 import { PharmacyContextProvider } from "./context/pharmacy-context";
 import Recetas from "./pages/recetas/recetas.jsx"
+import CardPaymentForm from "./pages/payment/pagos.jsx";
 const socket = io("http://localhost:3000");
 
 const App = () => {
@@ -77,7 +78,7 @@ const App = () => {
       <Router>
         <div className="min-h-screen bg-gray-100 flex flex-col w-screen items-center mt-0">
           {/* Ajuste del header */}
-          <header className="bg-fuchsia-900 text-white p-8 flex justify-between items-center w-full absolute top-0 left-0 z-50">
+          <header className="bg-fuchsia-900 text-white py-12 p-8 flex justify-between items-center w-full relative z-50">
             <div className="flex items-center">
               <Link to="/">
                 {/* Cambiar tamaño del logo */}
@@ -119,7 +120,7 @@ const App = () => {
           </header>
 
           {/* Ajustar el espacio para el contenido para que el header no se sobreponga */}
-          <main className="flex-grow container w-screen p-4 pt-20">
+          <main className="flex-grow container w-screen p-4">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/ver_usuarios" element={<VerUsuarios />} />
@@ -134,35 +135,40 @@ const App = () => {
               <Route path="/messages" element={<Messages />} />
               <Route path="/notifications" element={<Notificaciones />} />
               <Route path="/prescriptions" element={<Recetas />} />
+              <Route path="/pagar/:orderId" element={<CardPaymentForm />} />
             </Routes>
           </main>
 
           {/* Footer */}
-          <footer className="bg-gray-200 text-center p-4 w-screen mt-0">
-            <div className="flex flex-col md:flex-row justify-around items-center mt-2">
-              <div>
-                <img src={logofooter} alt="Hospital Infantil" className="w-32 mx-auto mb-4 md:mb-0 ml-1" />
-                <p>Avenida Alejandro von Humboldt 11431 y<br></br> Garita de Otay,22430 Tijuana, Baja <br></br>California</p>
+          <footer className="bg-gray-200 text-center px-4 w-screen">
+            <div className="flex flex-col md:flex-row justify-around items-start mt-8 space-y-6 md:space-y-0">
+
+              <div className="flex flex-col items-center text-center">
+                <img src={logofooter} alt="Hospital Infantil" className="w-32 mb-4" />
+                <p className="font-semibold text-fuchsia-900">Avenida Alejandro von Humboldt 11431 y<br />
+                  Garita de Otay, 22430 Tijuana, Baja<br />
+                  California
+                </p>
               </div>
 
-              <div>
-                <h3 className="font-semibold mt-[3px]">Sobre Nosotros</h3>
-                <p>Misión, Visión y Valores</p>
-                <p>Historia Hospital</p>
-                <p>Noticias</p>
-                <p>Más información</p>
+              <div className="text-left">
+                <h3 className="font-bold mb-2 text-black">Sobre Nosotros</h3>
+                <p className="font-semibold text-fuchsia-900">Misión, Visión y Valores</p>
+                <p className="font-semibold text-fuchsia-900">Historia Hospital</p>
+                <p className="font-semibold text-fuchsia-900">Noticias</p>
+                <p className="font-semibold text-fuchsia-900">Más información</p>
               </div>
 
-              <div>
-                <h3 className="font-semibold mt-[3px]">Contacto</h3>
-                <p>664-973-7735</p>
-                <p>664-979-7797</p>
-                <p>ext. 603-417</p>
+              <div className="text-left">
+                <h3 className="font-bold text-black mb-2">Contacto</h3>
+                <p className="font-semibold text-fuchsia-900">664-973-7735</p>
+                <p className="font-semibold text-fuchsia-900">664-979-7797</p>
+                <p className="font-semibold text-fuchsia-900">ext. 603-417</p>
               </div>
 
-              <div>
-                <h3 className="font-semibold mt-[3px]">Redes Sociales</h3>
-                <div className="flex justify-center space-x-3 mt-3">
+              <div className="text-left">
+                <h3 className="font-bold text-black mb-2">Redes Sociales</h3>
+                <div className="flex justify-start space-x-3 mt-3">
                   <a href="#" target="_blank" rel="noopener noreferrer">
                     <img src={insta} alt="Instagram" className="h-6 w-6" />
                   </a>
@@ -177,11 +183,14 @@ const App = () => {
                   </a>
                 </div>
               </div>
+
             </div>
-            <div className="bg-gray-200 text-center p-4 w-full mt-4 mb-0">
-                <p>&copy; 2024 Farmacia Online. Todos los derechos reservados.</p>
-              </div>
+
+            <div className="text-center mt-8">
+              <p>&copy; 2024 Farmacia Online. Todos los derechos reservados.</p>
+            </div>
           </footer>
+
         </div>
       </Router>
     </PharmacyContextProvider>
