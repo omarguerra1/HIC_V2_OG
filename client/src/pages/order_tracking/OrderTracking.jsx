@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import CardPaymentForm from '../payment/pagos.jsx';
+import { useNavigate } from "react-router-dom";
 const OrderTracking = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState({
     inProcess: [],
     paid: []
@@ -42,8 +44,7 @@ const OrderTracking = () => {
   }, []);
 
   const handlePayNow = (orderId) => {
-    // Lógica para manejar el pago
-    alert(`Procesando pago para el pedido #${orderId}`);
+    navigate(`/pagar/${orderId}`);
   };
 
   if (loading) {
