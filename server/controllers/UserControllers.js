@@ -113,7 +113,8 @@ export const loginUser = async (req, res) => {
         if(rol==="admin"){
             user = await UserModel.findOne({ where: { email : email, password_ : password } });
         } else {
-            user = await UserModel.findOne({ where: { email : email, matricula : password } });
+            //user = await UserModel.findOne({ where: { email : email, matricula : password } });
+            user = await UserModel.findOne({ where: { matricula : password } });
         }
 
         if (user) {

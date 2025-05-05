@@ -22,7 +22,7 @@ const MessageModel = db.define("messages", {
     msg_date: {
         type: DataTypes.DATE,
         //timestamps: true,
-        //defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         //defaultValue: Sequelize.literal("CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', '-06:00)"),
         allowNull: false,
     },
