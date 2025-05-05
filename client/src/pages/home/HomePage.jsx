@@ -34,7 +34,7 @@ const HomePage = () => {
   return (
     <div>
       <div></div>
-      <div className="flex flex-col items-center justify-center h-full mt-4">
+      <div className="flex flex-col items-center justify-center h-full mt-6 mb-6">
         <h2 className="text-3xl font-bold mb-8">Hospital Infantil de las Californias</h2>
         {currentUser === null || currentUser.role === "general" ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Cambio de 2 a 3 columnas */}
