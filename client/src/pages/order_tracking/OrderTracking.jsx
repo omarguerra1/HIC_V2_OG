@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import CardPaymentForm from '../payment/pagos.jsx';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 const OrderTracking = () => {
   const navigate = useNavigate();
@@ -55,7 +53,7 @@ const OrderTracking = () => {
     <div className="flex flex-row justify-between p-4 max-w-6xl mx-auto h-auto gap-8">
       <div className="bg-white rounded-lg shadow-md p-6 w-1/2 mt-6">
         <div>
-
+          
         </div>
         <h1 className="text-2xl font-bold mb-6 ">Pedidos en Proceso</h1>
         {orders.inProcess.length > 0 ? (

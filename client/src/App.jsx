@@ -1,6 +1,6 @@
 import "./App.css";
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 import logo from './images/LogoOficial.png';
 import logofooter from './images/LogoOficial.png'
 import insta from './images/instagram.png'
@@ -25,7 +25,6 @@ import UploadComponent from "./pages/request_order/UploadComponent.jsx";
 import Login from "./pages/login/login"; // Login para administradores
 import VerUsuarios from "./pages/admin_pages/VerUsuarios.jsx"
 import VerOrdenes from "./pages/admin_pages/VerOrdenes.jsx"
-import { PharmacyContextProvider } from "./context/pharmacy-context";
 import Recetas from "./pages/recetas/recetas.jsx"
 import CardPaymentForm from "./pages/payment/pagos.jsx";
 const socket = io("http://localhost:3000");
@@ -74,11 +73,10 @@ const App = () => {
   };
 
   return (
-    <PharmacyContextProvider>
       <Router>
-        <div className="min-h-screen bg-gray-100 flex flex-col w-screen items-center mt-0">
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center">
           {/* Ajuste del header */}
-          <header className="bg-fuchsia-900 text-white py-12 p-8 flex justify-between items-center w-full relative z-50">
+          <header className="bg-fuchsia-900 text-white py-8 p-8 flex justify-between items-center w-full relative z-50">
             <div className="flex items-center">
               <Link to="/">
                 {/* Cambiar tamaño del logo */}
@@ -169,16 +167,16 @@ const App = () => {
               <div className="text-left">
                 <h3 className="font-bold text-black mb-2">Redes Sociales</h3>
                 <div className="flex justify-start space-x-3 mt-3">
-                  <a href="#" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.instagram.com/hicoficial/" target="_blank" rel="noopener noreferrer">
                     <img src={insta} alt="Instagram" className="h-6 w-6" />
                   </a>
-                  <a href="#" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.facebook.com/hicoficial/" target="_blank" rel="noopener noreferrer">
                     <img src={fa} alt="Facebook" className="h-6 w-6" />
                   </a>
-                  <a href="#" target="_blank" rel="noopener noreferrer">
+                  <a href="https://x.com/hicoficial" target="_blank" rel="noopener noreferrer">
                     <img src={twitter} alt="Twitter" className="h-6 w-6" />
                   </a>
-                  <a href="#" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.youtube.com/user/HICoficial/" target="_blank" rel="noopener noreferrer">
                     <img src={youtube} alt="Website" className="h-6 w-6" />
                   </a>
                 </div>
@@ -187,13 +185,12 @@ const App = () => {
             </div>
 
             <div className="text-center mt-8">
-              <p>&copy; 2024 Farmacia Online. Todos los derechos reservados.</p>
+              <p>&copy; 2025 Hospital Infantil de las Californias. Todos los derechos reservados.</p>
             </div>
           </footer>
 
         </div>
       </Router>
-    </PharmacyContextProvider>
   );
 };
 export default App;
