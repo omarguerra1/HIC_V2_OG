@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from '../../images/logo1.png'
@@ -8,7 +8,7 @@ const LoginGeneral = () => {
 
     const navigate = useNavigate();
     const [matricula, setMatricula] = useState('');
-    const [user, setUsers] = useState([]);
+    const [setUsers] = useState([]);
     const [activeButton, setActiveButton] = useState("general");
 
     const navigateRegister = () => {

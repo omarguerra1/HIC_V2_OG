@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Package, Bell, Mail, Clipboard } from 'lucide-react'; // Asegúrate de tener instalada la librería de iconos

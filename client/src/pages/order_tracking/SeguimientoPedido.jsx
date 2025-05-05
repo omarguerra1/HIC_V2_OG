@@ -1,4 +1,3 @@
-import React from 'react';
 import OrderTracking from './OrderTracking'; // Importamos el componente de OrderTracking
 
 const SeguimientoPedido = () => {
