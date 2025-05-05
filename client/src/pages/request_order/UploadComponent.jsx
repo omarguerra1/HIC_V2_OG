@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProgressBar from './ProgressBar';
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
@@ -10,7 +10,6 @@ const UploadComponent = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadCancelToken, setUploadCancelToken] = useState(null);
   const [success, setSuccess] = useState(false);
   const [medCount, setMedCount] = useState(1);
   const [flavors, setFlavors] = useState([]);
@@ -20,14 +19,16 @@ const UploadComponent = () => {
   const [fechaDeNacimiento, setFechaDeNacimiento] = useState("");
   const [padecimiento, setPadecimiento] = useState("");
   const [intoleranciaLactosa, setIntoleranciaLactosa] = useState("No");
-
+  const [tieneFoto, setTieneFoto] = useState('');
+  const [cuestionarioRespondido, setCuestionarioRespondido] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   //Datos de usuario
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("usuarioActual"));
     setCurrentUser(user);
-    setFlavors(Array(medCount).fill("")); // ✅ Asegurar que flavors siempre tenga el tamaño correcto
+    setFlavors(Array(medCount).fill("")); // Asegurar que flavors siempre tenga el tamaño correcto
   }, [medCount]);
 
 
@@ -121,62 +122,90 @@ const UploadComponent = () => {
     <div className="flex max-w-6xl mx-auto p-6 gap-6">
       {/* Formulario de paciente */}
       <div className="w-1/2 bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">Cuestionario</h2>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Nombre completo</label>
-          <input
-            type="text"
-            value={nombreCompleto}
-            onChange={(e) => setNombreCompleto(e.target.value)}
-            className="w-full p-2 border rounded-lg bg-white text-black"
-          />
-        </div>
+        <h2 className="text-2xl font-bold mb-4">¿Tienes la foto de tu receta médica?</h2>
+        <select
+          value={tieneFoto}
+          onChange={(e) => {
+            const valor = e.target.value;
+            setTieneFoto(valor);
+            setMostrarFormulario(valor === 'Sí');
+            setCuestionarioRespondido(false); // Reinicia si cambia
+          }}
+          className="w-full p-2 border rounded-lg bg-white text-black mb-4"
+        >
+          <option value="">Seleccione una opción</option>
+          <option value="Sí">Sí</option>
+          <option value="No">No</option>
+        </select>
+        {mostrarFormulario && !cuestionarioRespondido && (
+          <>
+            <h2 className="text-2xl font-bold mb-4">Cuestionario</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Nombre completo</label>
+              <input
+                type="text"
+                value={nombreCompleto}
+                onChange={(e) => setNombreCompleto(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Peso (kg)</label>
-          <input
-            type="number"
-            value={peso}
-            onChange={(e) => setPeso(e.target.value)}
-            className="w-full p-2 border rounded-lg bg-white text-black"
-          />
-        </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Peso (kg)</label>
+              <input
+                type="number"
+                value={peso}
+                onChange={(e) => setPeso(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-          <input
-            type="date"
-            value={fechaDeNacimiento}
-            onChange={(e) => setFechaDeNacimiento(e.target.value)}
-            className="w-full p-2 border rounded-lg bg-white text-black"
-          />
-        </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+              <input
+                type="date"
+                value={fechaDeNacimiento}
+                onChange={(e) => setFechaDeNacimiento(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Diagnóstico o padecimiento</label>
-          <input
-            type="text"
-            value={padecimiento}
-            onChange={(e) => setPadecimiento(e.target.value)}
-            className="w-full p-2 border rounded-lg bg-white text-black"
-          />
-        </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Diagnóstico o padecimiento</label>
+              <input
+                type="text"
+                value={padecimiento}
+                onChange={(e) => setPadecimiento(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+              />
+            </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">¿Intolerante a lactosa?</label>
-          <select
-            value={intoleranciaLactosa}
-            onChange={(e) => setIntoleranciaLactosa(e.target.value)}
-            className="w-full p-2 border rounded-lg bg-white text-black"
-          >
-            <option value="No">No</option>
-            <option value="Sí">Sí</option>
-          </select>
-        </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">¿Intolerante a lactosa?</label>
+              <select
+                value={intoleranciaLactosa}
+                onChange={(e) => setIntoleranciaLactosa(e.target.value)}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+              >
+                <option value="No">No</option>
+                <option value="Sí">Sí</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => setCuestionarioRespondido(true)}
+              className="w-full py-2 px-4 bg-green-600 text-white rounded-lg mt-4 hover:bg-green-700"
+            >
+              Enviar cuestionario
+            </button>
+          </>
+        )}
+
       </div>
 
       {/* Subida de receta y sabores */}
-      <div className="w-1/2 bg-white shadow-lg rounded-lg p-6">
+      <div className={`w-1/2 bg-white shadow-lg rounded-lg p-6 transition-all duration-300 
+  ${!cuestionarioRespondido ? 'opacity-95 pointer-events-none blur-sm' : ''}`}>
         <h2 className="text-2xl font-bold mb-4">Cargar Receta Médica</h2>
         <label htmlFor="fileInput" className="block text-sm font-medium text-gray-700 mb-2">
           Selecciona una imagen:

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios"; 
 
 const Messages = () => {
@@ -109,6 +109,7 @@ const Messages = () => {
             window.location.reload();
         } catch(error){
             alert("El mensaje no pudo ser enviado");
+            console.error(error);
         }
         setWriting(false);
     };

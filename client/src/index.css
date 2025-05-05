@@ -17,13 +17,13 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #ffffff;
   min-height: 100vh;
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1)) /* #f3f4f6 */;
 }
 
 a {
