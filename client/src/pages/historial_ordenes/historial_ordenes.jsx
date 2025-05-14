@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
-const HistorialPagos = () => {
+const HistorialOrdenes = () => {
   const [orders, setOrders] = useState([]);
   const [userOrders, setUserOrders] = useState([]);
   const [page, setPage] = useState(1);
@@ -171,4 +171,4 @@ const HistorialPagos = () => {
   );
 };
 
-export default HistorialPagos;
+export default HistorialOrdenes;
