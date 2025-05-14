@@ -51,6 +51,13 @@ const OrderTracking = () => {
 
   return (
     <div className="flex flex-row justify-between p-4 max-w-6xl mx-auto h-auto gap-8">
+      <div className="mt-4 text-left" >
+        <button
+          onClick={() => window.history.back()}
+          className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center">
+          <span className="mr-2">←</span> Regresar
+        </button>
+      </div>
       <div className="bg-white rounded-lg shadow-md p-6 w-1/2 mt-6">
         <div>
           

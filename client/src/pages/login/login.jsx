@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from '../../images/logo1.png'
-import closeEye from '../../images/eye_close.png'
-import openEye from '../../images/eye_no_close.jpg'
 const URI = 'http://localhost:3000/user';
 
 const Login = () => {
@@ -12,7 +10,6 @@ const Login = () => {
     const [contraseña, setContraseña] = useState('');
     const [user, setUsers] = useState([]);
     const [activeButton, setActiveButton] = useState("admin");
-    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         getUsers();

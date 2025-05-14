@@ -35,7 +35,7 @@ const Messages = () => {
             await Promise.all(updatePromises);
             console.log("Mensajes actualizados");
         } catch(error){
-            console.error("Error al actualizar mensajes");
+            console.error("Error al actualizar mensajes->",error);
         }
     };
 
@@ -57,7 +57,7 @@ const Messages = () => {
                 }
             } catch(error){
                 alert("No se pudo obtener la informacion de los mensajes");
-                console.log("Error al obtener mensajes");
+                console.log("Error al obtener mensajes",error);
             }
         } else if(currentUser.role === "hic_admin"){
             try{
@@ -71,7 +71,7 @@ const Messages = () => {
                 setSentMsgs(msgWithNames);
             } catch(error){
                 alert("No se pudo obtener la informacion de los mensajes");
-                console.log("Error al obtener mensajes");
+                console.log("Error al obtener mensajes ->",error);
             }
         }
     }; 

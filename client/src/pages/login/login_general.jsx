@@ -17,7 +17,7 @@ const LoginGeneral = () => {
 
     useEffect(() => {
         getUsers();
-    }, [])
+    })
 
     const getUsers = async () => {
         try {

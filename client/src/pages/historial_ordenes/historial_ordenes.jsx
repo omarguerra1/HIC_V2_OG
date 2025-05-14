@@ -1,141 +1,174 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
-const HistorialOrdenes = () => {
+const HistorialPagos = () => {
+  const [orders, setOrders] = useState([]);
+  const [userOrders, setUserOrders] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [sortColumn, setSortColumn] = useState('order_date');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const perPage = 10;
 
-    const [orders, setOrders] = useState([]);
-    const [userOrders, setUserOrders] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [search, setSearch] = useState("");
-    const [foundOrder, setFoundOrder] = useState(null);
-    const [orderMsgOpen, setOrderMsg] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    setCurrentUser(user);
+  }, []);
 
-    useEffect( () => {
-        const user = JSON.parse(localStorage.getItem("usuarioActual"));
-        setCurrentUser(user);
-    }, []);
-  
-    useEffect( () => {
-      getOrders();
-    }, [page]);
+  useEffect(() => {
+    getOrders();
+  }, [page]);
 
-    useEffect( () => {
-        if(currentUser){
-            filterOrders();
-        }
-    }, [currentUser, orders]);
-  
-    const getOrders = async () => {
-      try{
-        const response = await axios.get("http://localhost:3000/order/", {
-          params: {page} 
-        });
-        setOrders(response.data.orders);
-        setTotalPages(response.data.totalPages);
-      } catch(error){
-        alert("No se pudo obtener la informacion de las ordenes");
-        console.log("Error al obtener ordenes");
+  useEffect(() => {
+    if (currentUser) {
+      filterOrders();
+    }
+  }, [currentUser, orders]);
+
+  useEffect(() => {
+    if (userOrders.length > 0) {
+      handleSort(sortColumn, sortDirection);
+    }
+  }, [userOrders.length]);
+
+  const getOrders = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/order/", {
+        params: { page }
+      });
+      setOrders(response.data.orders);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      alert("No se pudo obtener la información de las órdenes");
+      console.log("Error al obtener órdenes");
+    }
+  };
+
+  const filterOrders = () => {
+    const filtered = orders.filter(order => order.user_id === currentUser.user_id);
+    setUserOrders(filtered);
+  };
+
+  const handleSort = (column, directionOverride = null) => {
+    let direction = directionOverride || 'asc';
+    if (!directionOverride) {
+      if (column === sortColumn && sortDirection === 'asc') {
+        direction = 'desc';
       }
-    }; 
+    }
 
-    const filterOrders = () => {
-        const filteredOrders = orders.filter(order => order.user_id === currentUser.user_id);
-        setUserOrders(filteredOrders);
-    };
-  
-    const handleSearch = (e) => {
-      e.preventDefault();
-      if(search){
-        const foundOrder = userOrders.find(order => order.order_id.toString() === search);
-        if(foundOrder){
-          setFoundOrder(foundOrder);
-          setOrderMsg(true);
-        } else{
-          alert("No se encontro una orden con ese ID");
-          setFoundOrder(null);
-        }
-      } else{
-        alert("Ingrese un ID para buscar");
-        setFoundOrder(null);
+    setSortColumn(column);
+    setSortDirection(direction);
+
+    const sorted = [...userOrders].sort((a, b) => {
+      let aValue = a[column];
+      let bValue = b[column];
+
+      if (column === 'order_date') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
       }
-    };
-  
-    const handleOrderMsg = () => {
-      setOrderMsg(false);
-    };
-  
-      return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <h2 className="text-3xl font-bold mb-8">Historial de Ordenes</h2>
-  
-          <form onSubmit={handleSearch}
-            className="mb-4">
-              <input
-                type="text"
-                value={search}
-                onChange={(e)=>setSearch(e.target.value)}
-                placeholder="Ingrese una ID de orden"
-                className="p-2 border border-gray-300 rounded-md bg-white">
-              </input>
-              <button
-                type="submit"
-                className="ml-2 p-2 bg-blue-500 text-white, rounded-md">
-                Buscar
-              </button>
-          </form>
-  
-          <ul className="w-full max-w-md bg-white shadow-md rounded-lg p-4">
-            {userOrders.map((order) => (
-              <li key={order.order_id} className="border-b last:border-0 p-2">
-                  <p><strong>ID: </strong>{order.order_id}</p>
-                  <p><strong>Estado: </strong>{order.state}</p>
-                  <p><strong>Fecha de pedido: </strong>{order.order_date}</p>
-                  <p><strong>Fecha de entrega: </strong>{order.delivery_schedule}</p>
-              </li>
-            ))}
-          </ul>
-  
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={() => setPage(prevPage => Math.max(prevPage - 1, 1))}
-              disabled={page === 1}
-              className="p-2 bg-blue-500 hover:bg-blue-700 rounded-md mx-2" >
-              Anterior
-            </button>
-            <span className="py-2">Página {page} de {totalPages}</span>
-            <button
-              onClick={() => setPage(prevPage => Math.max(prevPage + 1, totalPages))}
-              disabled={page === totalPages}
-              className="p-2 bg-blue-500 hover:bg-blue-700 rounded-md mx-2" >
-              Siguiente
-            </button>
-          </div>
-  
-          {orderMsgOpen && (
-          <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full'>
-            <div className="relative top-1/4 mx-auto p-5 border w-1/2 shadow-lg rounded-md bg-white"> 
-              <button 
-                onClick={handleOrderMsg} 
-                className="absolute top-0 right-0 m-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-                Aceptar
-              </button> 
-              {foundOrder && ( 
-                <div> 
-                  <h3 className="text-xl font-bold mb-4">
-                    Detalles de la Oden:
-                  </h3> 
-                    <p><strong>ID: </strong>{foundOrder.order_id}</p>
-                    <p><strong>Estado: </strong>{foundOrder.state}</p>
-                    <p><strong>Fecha de pedido: </strong>{foundOrder.order_date}</p>
-                    <p><strong>Fecha de entrega: </strong>{foundOrder.delivery_schedule}</p>
-                </div> )} 
-              </div> 
-            </div>
-        )}
-        </div>
-      );
-    };
 
-export default HistorialOrdenes;
+      if (column === 'amount') {
+        aValue = parseFloat(aValue);
+        bValue = parseFloat(bValue);
+      }
+
+      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    setUserOrders(sorted);
+  };
+
+  const getSortIcon = (column) => {
+    if (sortColumn !== column) return <FaSort className="inline ml-2 text-gray-400" />;
+    return sortDirection === 'asc' ? (
+      <FaSortUp className="inline ml-2 text-blue-500" />
+    ) : (
+      <FaSortDown className="inline ml-2 text-blue-500" />
+    );
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <button
+        onClick={() => window.history.back()}
+        className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center"
+      >
+        <span className="mr-2">←</span> Regresar
+      </button>
+
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Historial de Pagos</h2>
+
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <table className="w-full table-auto" role="table" aria-label="Tabla de historial de pagos">
+          <thead>
+            <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_id")}>
+                ID {getSortIcon("order_id")}
+              </th>
+              <th className="py-3 px-6 text-left">Detalles</th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("amount")}>
+                Importe {getSortIcon("amount")}
+              </th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_date")}>
+                Fecha {getSortIcon("order_date")}
+              </th>
+              <th className="py-3 px-6 text-left">Cliente</th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("state")}>
+                Estado {getSortIcon("state")}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {userOrders.length > 0 ? (
+              userOrders.map(order => (
+                <tr
+                  key={order.order_id}
+                  className="border-b border-gray-200 hover:bg-gray-50 transition duration-300"
+                >
+                  <td className="py-3 px-6 text-left">{order.order_id}</td>
+                  <td className="py-3 px-6 text-left">{order.details || "Sin detalles"}</td>
+                  <td className="py-3 px-6 text-left">${order.amount || "0.00"}</td>
+                  <td className="py-3 px-6 text-left">{order.order_date}</td>
+                  <td className="py-3 px-6 text-left">{order.user_name || "Cliente N/D"}</td>
+                  <td className="py-3 px-6 text-left">{order.state}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="py-4 px-6 text-gray-500 text-center">
+                  No hay pagos registrados
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex justify-between mt-6 items-center">
+        <button
+          onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:bg-blue-600 transition duration-300"
+        >
+          Anterior
+        </button>
+        <span className="text-gray-700 py-2">Página {page} de {totalPages}</span>
+        <button
+          onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:bg-blue-600 transition duration-300"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default HistorialPagos;
