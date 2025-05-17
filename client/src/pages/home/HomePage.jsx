@@ -54,7 +54,7 @@ const HomePage = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Link to="/prescriptions" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
               <Clipboard size={48} className="text-purple-600 mb-4" />
               <span className="text-xl font-semibold">Recetas</span>
@@ -62,10 +62,6 @@ const HomePage = () => {
             <Link to="/ver_ordenes" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
               <Package size={48} className="text-green-600 mb-4" />
               <span className="text-xl font-semibold">Ver Ordenes</span>
-            </Link>
-            <Link to="/notifications" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Bell size={48} className="text-red-600 mb-4" />
-              <span className="text-xl font-semibold">Notificaciones</span>
             </Link>
             <Link to="/messages" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
               <Mail size={48} className="text-yellow-600 mb-4" />
