@@ -3,66 +3,36 @@ import axios from "axios";
 
 export const PharmacyContext = createContext(null);
 
-const API_BASE_URL = "http://localhost:3001"; // Base de la API
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
-export const PharmacyContextProvider = (props) => {
-  const [logged, setLogged] = useState(false); // Estado para saber si hay un usuario logueado
-  const [userRole, setUserRole] = useState(null); // Rol del usuario (e.g., "general", "hic_admin")
-  const [prescriptions, setPrescriptions] = useState([]); // Lista de recetas médicas subidas
-  const [orderStatus, setOrderStatus] = useState([]); // Estado de pedidos de medicamentos
+export const PharmacyContextProvider = ({ children }) => {
+  const [user, setUser] = useState({ logged: false, role: null });
+  const [data, setData] = useState({ prescriptions: [], orders: [] });
 
   useEffect(() => {
-    if (logged) {
-      fetchPrescriptions(); // Si hay un usuario logueado, obtener recetas
-      fetchOrderStatus(); // Obtener estado de pedidos
+    if (user.logged) {
+      fetchData();
     }
-  }, [logged]);
+  }, [user.logged]);
 
-  // Cambiar estado de sesión
-  const login = (role) => {
-    setLogged(true);
-    setUserRole(role);
-  };
-
-  const logout = () => {
-    setLogged(false);
-    setUserRole(null);
-  };
-
-  // Obtener recetas médicas del backend
-  const fetchPrescriptions = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/prescriptions`);
-      setPrescriptions(response.data);
+      const [prescriptionsRes, ordersRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/prescriptions`),
+        axios.get(`${API_BASE_URL}/orders`),
+      ]);
+      setData({ prescriptions: prescriptionsRes.data, orders: ordersRes.data });
     } catch (error) {
-      console.error("Error al obtener las recetas:", error);
+      console.warn("Error al obtener datos:", error);
     }
   };
 
-  // Obtener el estado de los pedidos
-  const fetchOrderStatus = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/orders`);
-      setOrderStatus(response.data);
-    } catch (error) {
-      console.error("Error al obtener el estado de los pedidos:", error);
-    }
-  };
-
-  const contextValue = {
-    logged,
-    userRole,
-    prescriptions,
-    orderStatus,
-    login,
-    logout,
-    fetchPrescriptions,
-    fetchOrderStatus,
-  };
+  const login = (role) => setUser({ logged: true, role });
+  const logout = () => setUser({ logged: false, role: null });
 
   return (
-    <PharmacyContext.Provider value={contextValue}>
-      {props.children}
+    <PharmacyContext.Provider value={{ ...user, ...data, login, logout, fetchData }}>
+      {children}
     </PharmacyContext.Provider>
   );
 };

@@ -4,32 +4,39 @@ import { PharmacyContext } from "../context/pharmacy-context";
 import "./navbar.css";
 
 export const Navbar = () => {
-  const { logged , userRole , logout } = useContext(PharmacyContext);
+  const { logged, userRole, logout } = useContext(PharmacyContext);
+
+  // Función para generar los enlaces según el rol del usuario
+  const getLinks = () => {
+    if (!logged) {
+      return [
+        { path: "/", label: "Inicio" },
+        { path: "/login", label: "Iniciar Sesión" },
+      ];
+    }
+
+    if (userRole === "hic_admin") {
+      return [
+        { path: "/managePrescriptions", label: "Gestión de Recetas" },
+        { path: "/manageOrders", label: "Gestión de Pedidos" },
+      ];
+    }
+
+    return [
+      { path: "/UploadComponent", label: "Subir Receta" },
+      { path: "/SeguimientoPedido", label: "Seguimiento de Pedidos" },
+      { path: "/Notifications", label: "Notificaciones" },
+    ];
+  };
 
   return (
     <div className="navbar">
-      {!logged ? (
-        // Opciones si no esta logueado
-        <div className="links">
-          <Link to="/">Inicio</Link>
-          <Link to="/login">Iniciar Sesión</Link>
-        </div>
-      ) : userRole === "hic_admin" ? (
-        // Opciones para administrador
-        <div className="links">
-          <Link to="/managePrescriptions">Gestión de Recetas</Link>
-          <Link to="/manageOrders">Gestión de Pedidos</Link>
-          <button onClick={logout}>Cerrar Sesión</button>
-        </div>
-      ) : (
-        // Opciones para usuario general
-        <div className="links">
-          <Link to="/UploadComponent">Subir Receta</Link>
-          <Link to="/SeguimientoPedido">Seguimiento de Pedidos</Link>
-          <Link to="/Notifications">Notificaciones</Link>
-          <button onClick={logout}>Cerrar Sesión</button>
-        </div>
-      )}
+      <div className="links">
+        {getLinks().map(({ path, label }) => (
+          <Link key={path} to={path}>{label}</Link>
+        ))}
+        {logged && <button onClick={logout}>Cerrar Sesión</button>}
+      </div>
     </div>
   );
 };

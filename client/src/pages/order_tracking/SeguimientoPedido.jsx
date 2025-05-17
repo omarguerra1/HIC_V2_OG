@@ -1,11 +1,12 @@
-import OrderTracking from './OrderTracking'; // Importamos el componente de OrderTracking
+import React, { memo } from "react";
+import OrderTracking from "./OrderTracking"; // Importamos el componente reutilizable
 
-const SeguimientoPedido = () => {
+const SeguimientoPedido = memo(() => {
   return (
     <div className="w-full p-4">
-      <OrderTracking /> {/* Reutilizamos el componente OrderTracking */}
+      <OrderTracking />
     </div>
   );
-};
+});
 
 export default SeguimientoPedido;
