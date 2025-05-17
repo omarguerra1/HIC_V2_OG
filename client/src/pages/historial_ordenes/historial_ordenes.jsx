@@ -3,7 +3,8 @@ import axios from "axios";
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const HistorialOrdenes = () => {
-  const [orders, setOrders] = useState([]);
+  //const [orders, setOrders] = useState([]);
+  const [HistorialPagos, setHistorialPagos] = useState([]);
   const [userOrders, setUserOrders] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,14 +19,14 @@ const HistorialOrdenes = () => {
   }, []);
 
   useEffect(() => {
-    getOrders();
+    getHistorialPagos();
   }, [page]);
 
   useEffect(() => {
     if (currentUser) {
       filterOrders();
     }
-  }, [currentUser, orders]);
+  }, [currentUser, HistorialPagos]);
 
   useEffect(() => {
     if (userOrders.length > 0) {
@@ -33,13 +34,15 @@ const HistorialOrdenes = () => {
     }
   }, [userOrders.length]);
 
-  const getOrders = async () => {
+  const getHistorialPagos = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/order/", {
+      const response = await axios.get("http://localhost:3000/historial_pagos/", { //orders
         params: { page }
       });
-      setOrders(response.data.orders);
+      setHistorialPagos(response.data.historial);
       setTotalPages(response.data.totalPages);
+      console.log("Datos Recibidos")
+      alert("Usuario actual:", currentUser);
     } catch (error) {
       alert("No se pudo obtener la información de las órdenes");
       console.log("Error al obtener órdenes");
@@ -47,7 +50,8 @@ const HistorialOrdenes = () => {
   };
 
   const filterOrders = () => {
-    const filtered = orders.filter(order => order.user_id === currentUser.user_id);
+    const filtered = HistorialPagos.filter(order => order.user_name === currentUser.name_);
+    console.log("Usuario actual:", currentUser);
     setUserOrders(filtered);
   };
 
@@ -72,8 +76,8 @@ const HistorialOrdenes = () => {
       }
 
       if (column === 'amount') {
-        aValue = parseFloat(aValue);
-        bValue = parseFloat(bValue);
+        //aValue = parseFloat(aValue);
+        //bValue = parseFloat(bValue);
       }
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
@@ -111,7 +115,7 @@ const HistorialOrdenes = () => {
               <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_id")}>
                 ID {getSortIcon("order_id")}
               </th>
-              <th className="py-3 px-6 text-left">Detalles</th>
+              <th className="py-3 px-6 text-left">Prescripción</th>
               <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("amount")}>
                 Importe {getSortIcon("amount")}
               </th>
@@ -132,20 +136,11 @@ const HistorialOrdenes = () => {
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-300"
                 >
                   <td className="py-3 px-6 text-left">{order.order_id}</td>
-                  <td className="py-3 px-6 text-left">{order.details || "Sin detalles"}</td>
+                  <td className="py-3 px-6 text-left">{order.prescription_id || "Sin detalles"}</td>
                   <td className="py-3 px-6 text-left">${order.amount || "0.00"}</td>
                   <td className="py-3 px-6 text-left">{order.order_date}</td>
                   <td className="py-3 px-6 text-left">{order.user_name || "Cliente N/D"}</td>
-                  <td className="py-3 px-6 text-left">
-                    <span
-                      className={`${order.state === 'Entregada' ? 'bg-green-200 text-green-600'
-                        : order.state === 'Lista' ? 'bg-blue-200 text-blue-600'
-                          : 'bg-yellow-200 text-yellow-600'} 
-                    py-1 px-3 rounded-full text-xs`}
-                    >
-                      {order.state}
-                    </span>
-                  </td>
+                  <td className="py-3 px-6 text-left">{order.state}</td>
                 </tr>
               ))
             ) : (
