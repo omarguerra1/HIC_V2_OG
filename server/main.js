@@ -8,6 +8,7 @@ import orderRoutes from "./routes/orderRoutes.js" //Rutas de orden
 import messageRoutes from "./routes/messageRoutes.js";
 import prescriptionsRoutes from "./routes/prescriptionsRoutes.js"
 import medicineRoutes from "./routes/medicamentoRoutes.js";
+import HistorialPagosRoutes from "./routes/HistorialPagosRoutes.js";
 import './database/associations.js';
 import {Server} from "socket.io";
 import http from "http";
@@ -36,6 +37,8 @@ app.use('/order', orderRoutes);
 app.use("/message", messageRoutes);
 app.use('/prescriptions', prescriptionsRoutes);
 app.use("/medicines", medicineRoutes);
+app.use("/historial_pagos", HistorialPagosRoutes);
+
 
 try {
     await db.authenticate();

@@ -3,6 +3,7 @@ import OrderModel from "../models/OrderModel.js";
 import MessageModel from "../models/MessageModel.js";
 import MedicineModel from "../models/MedicamentoModel.js";
 import PrescriptionModel from "../models/PrescriptionModel.js";
+import HistorialPagos from "../models/HistorialPagosModel.js";
 
 //Relaciones entre Orden y Usuario
 UserModel.hasMany(OrderModel, {
@@ -52,4 +53,4 @@ PrescriptionModel.hasMany(MedicineModel, {
     foreignKey: "prescription_id"
 });
 
-export { UserModel, OrderModel, MessageModel, PrescriptionModel, MedicineModel };
+export { UserModel, OrderModel, MessageModel, PrescriptionModel, MedicineModel, HistorialPagos };

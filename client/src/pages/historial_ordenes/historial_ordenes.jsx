@@ -1,113 +1,176 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
-const API_BASE_URL = "http://localhost:3000/order/";
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 const HistorialOrdenes = () => {
-  const [state, setState] = useState({
-    orders: [],
-    userOrders: [],
-    page: 1,
-    totalPages: 1,
-    search: "",
-    foundOrder: null,
-    orderMsgOpen: false,
-    currentUser: JSON.parse(localStorage.getItem("usuarioActual")) || null,
-  });
+  //const [orders, setOrders] = useState([]);
+  const [HistorialPagos, setHistorialPagos] = useState([]);
+  const [userOrders, setUserOrders] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [sortColumn, setSortColumn] = useState('order_date');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const perPage = 10;
 
   useEffect(() => {
-    getOrders();
-  }, [state.page]);
+    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    setCurrentUser(user);
+  }, []);
 
-  const getOrders = async () => {
+  useEffect(() => {
+    getHistorialPagos();
+  }, [page]);
+
+  useEffect(() => {
+    if (currentUser) {
+      filterOrders();
+    }
+  }, [currentUser, HistorialPagos]);
+
+  useEffect(() => {
+    if (userOrders.length > 0) {
+      handleSort(sortColumn, sortDirection);
+    }
+  }, [userOrders.length]);
+
+  const getHistorialPagos = async () => {
     try {
-      const response = await axios.get(API_BASE_URL, { params: { page: state.page } });
-      const filteredOrders = response.data.orders.filter(order => order.user_id === state.currentUser?.user_id);
-      setState(prev => ({
-        ...prev,
-        orders: response.data.orders,
-        userOrders: filteredOrders,
-        totalPages: response.data.totalPages,
-      }));
+      const response = await axios.get("http://localhost:3000/historial_pagos/", { //orders
+        params: { page }
+      });
+      setHistorialPagos(response.data.historial);
+      setTotalPages(response.data.totalPages);
+      console.log("Datos Recibidos")
+      alert("Usuario actual:", currentUser);
     } catch (error) {
       alert("No se pudo obtener la información de las órdenes");
-      console.warn("Error al obtener órdenes:", error);
+      console.log("Error al obtener órdenes");
     }
   };
 
-  const handleChange = (e) => {
-    setState(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const filterOrders = () => {
+    const filtered = HistorialPagos.filter(order => order.user_name === currentUser.name_);
+    console.log("Usuario actual:", currentUser);
+    setUserOrders(filtered);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const foundOrder = state.userOrders.find(order => order.order_id.toString() === state.search);
-    if (foundOrder) {
-      setState(prev => ({ ...prev, foundOrder, orderMsgOpen: true }));
-    } else {
-      alert("No se encontró una orden con ese ID");
+  const handleSort = (column, directionOverride = null) => {
+    let direction = directionOverride || 'asc';
+    if (!directionOverride) {
+      if (column === sortColumn && sortDirection === 'asc') {
+        direction = 'desc';
+      }
     }
+
+    setSortColumn(column);
+    setSortDirection(direction);
+
+    const sorted = [...userOrders].sort((a, b) => {
+      let aValue = a[column];
+      let bValue = b[column];
+
+      if (column === 'order_date') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+
+      if (column === 'amount') {
+        //aValue = parseFloat(aValue);
+        //bValue = parseFloat(bValue);
+      }
+
+      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    setUserOrders(sorted);
+  };
+
+  const getSortIcon = (column) => {
+    if (sortColumn !== column) return <FaSort className="inline ml-2 text-gray-400" />;
+    return sortDirection === 'asc' ? (
+      <FaSortUp className="inline ml-2 text-blue-500" />
+    ) : (
+      <FaSortDown className="inline ml-2 text-blue-500" />
+    );
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <h2 className="text-3xl font-bold mb-8">Historial de Órdenes</h2>
+    <div className="container mx-auto px-4 py-8">
+      <button
+        onClick={() => window.history.back()}
+        className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center"
+      >
+        <span className="mr-2">←</span> Regresar
+      </button>
 
-      <form onSubmit={handleSearch} className="mb-4">
-        <label htmlFor="search">Buscar por ID:</label>
-        <input
-          id="search"
-          type="text"
-          name="search"
-          value={state.search}
-          onChange={handleChange}
-          placeholder="Ingrese una ID de orden"
-          className="p-2 border border-gray-300 rounded-md bg-white"
-        />
-        <button type="submit" className="ml-2 p-2 bg-blue-500 text-white rounded-md">
-          Buscar
-        </button>
-      </form>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Historial de Pagos</h2>
 
-      <ul className="w-full max-w-md bg-white shadow-md rounded-lg p-4">
-        {state.userOrders.map((order) => (
-          <li key={order.order_id} className="border-b last:border-0 p-2">
-            <p><strong>ID:</strong> {order.order_id}</p>
-            <p><strong>Estado:</strong> {order.state}</p>
-            <p><strong>Fecha de pedido:</strong> {order.order_date}</p>
-            <p><strong>Fecha de entrega:</strong> {order.delivery_schedule}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <table className="w-full table-auto" role="table" aria-label="Tabla de historial de pagos">
+          <thead>
+            <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_id")}>
+                ID {getSortIcon("order_id")}
+              </th>
+              <th className="py-3 px-6 text-left">Prescripción</th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("amount")}>
+                Importe {getSortIcon("amount")}
+              </th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_date")}>
+                Fecha {getSortIcon("order_date")}
+              </th>
+              <th className="py-3 px-6 text-left">Cliente</th>
+              <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("state")}>
+                Estado {getSortIcon("state")}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {userOrders.length > 0 ? (
+              userOrders.map(order => (
+                <tr
+                  key={order.order_id}
+                  className="border-b border-gray-200 hover:bg-gray-50 transition duration-300"
+                >
+                  <td className="py-3 px-6 text-left">{order.order_id}</td>
+                  <td className="py-3 px-6 text-left">{order.prescription_id || "Sin detalles"}</td>
+                  <td className="py-3 px-6 text-left">${order.amount || "0.00"}</td>
+                  <td className="py-3 px-6 text-left">{order.order_date}</td>
+                  <td className="py-3 px-6 text-left">{order.user_name || "Cliente N/D"}</td>
+                  <td className="py-3 px-6 text-left">{order.state}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="py-4 px-6 text-gray-500 text-center">
+                  No hay pagos registrados
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex justify-between mt-4">
-        <button onClick={() => setState(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))} disabled={state.page === 1} className="p-2 bg-blue-500 rounded-md mx-2 hover:bg-blue-700">
+      <div className="flex justify-between mt-6 items-center">
+        <button
+          onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:bg-blue-600 transition duration-300"
+        >
           Anterior
         </button>
-        <span className="py-2">Página {state.page} de {state.totalPages}</span>
-        <button onClick={() => setState(prev => ({ ...prev, page: Math.min(prev.page + 1, state.totalPages) }))} disabled={state.page === state.totalPages} className="p-2 bg-blue-500 rounded-md mx-2 hover:bg-blue-700">
+        <span className="text-gray-700 py-2">Página {page} de {totalPages}</span>
+        <button
+          onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50 hover:bg-blue-600 transition duration-300"
+        >
           Siguiente
         </button>
       </div>
-
-      {state.orderMsgOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-          <div className="relative top-1/4 mx-auto p-5 border w-1/2 shadow-lg rounded-md bg-white">
-            <button onClick={() => setState(prev => ({ ...prev, orderMsgOpen: false }))} className="absolute top-0 right-0 m-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-              Aceptar
-            </button>
-            {state.foundOrder && (
-              <div>
-                <h3 className="text-xl font-bold mb-4">Detalles de la Orden:</h3>
-                <p><strong>ID:</strong> {state.foundOrder.order_id}</p>
-                <p><strong>Estado:</strong> {state.foundOrder.state}</p>
-                <p><strong>Fecha de pedido:</strong> {state.foundOrder.order_date}</p>
-                <p><strong>Fecha de entrega:</strong> {state.foundOrder.delivery_schedule}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
