@@ -1,7 +1,8 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from '../../images/logo1.png'
+import ResetMatricula from "./ResetMatricula";
 const URI = 'http://localhost:3000/user';  // Ruta del backend
 
 const LoginGeneral = () => {
@@ -10,6 +11,7 @@ const LoginGeneral = () => {
     const [matricula, setMatricula] = useState('');
     const [setUsers] = useState([]);
     const [activeButton, setActiveButton] = useState("general");
+    const [showModal, setShowModal] = useState(false);
 
     const navigateRegister = () => {
         navigate(`/register`);
@@ -81,13 +83,19 @@ const LoginGeneral = () => {
                     <input
                         value={matricula}
                         onChange={(e) => setMatricula(e.target.value)}
-                        
+
                         type="password"
                         name="password"
                         id="password"
                         placeholder="Ingrese su matricula"
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-black focus:border-blue-500 bg-gray-200 text-black"
                     />
+                </div>
+                {/* Nueva línea de ¿Olvidaste tu matrícula? */}
+                <div className="text-right mt-1">
+                    <button type="button" onClick={() => setShowModal(true)} className="bg-white text-sm text-blue-600 hover:underline">
+                        ¿Olvidaste tu matrícula?
+                    </button>
                 </div>
                 <div className="mt-4"></div>
                 <button
@@ -101,6 +109,7 @@ const LoginGeneral = () => {
                 className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg transition">
                 Regístrate
             </button>
+            {showModal && <ResetMatricula onClose={() => setShowModal(false)} />}
         </div>
     );
 };
