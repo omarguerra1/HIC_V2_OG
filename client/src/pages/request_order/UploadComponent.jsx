@@ -16,7 +16,7 @@ const UploadComponent = () => {
   const [flavors, setFlavors] = useState([]);
   const availableFlavors = ["Fresa", "Uva", "Plátano", "Mango", "Piña", "Chicle Rosa", "Chicle Azul", "Grosella"];
   const [nombreCompleto, setNombreCompleto] = useState("");
-  const [peso, setPeso] = useState(0);
+  const [peso, setPeso] = useState("");
   const [fechaDeNacimiento, setFechaDeNacimiento] = useState("");
   const [padecimiento, setPadecimiento] = useState("");
   const [intoleranciaLactosa, setIntoleranciaLactosa] = useState("No");
@@ -85,12 +85,13 @@ const UploadComponent = () => {
         setSuccess(true);
         setImageUrl(`http://localhost:3000${response.data.prescription.image_url}`);
         //navigate("/", { replace: true });
-        window.location.reload();
+        //window.location.reload();
       }
       else if (response.status === 400) {
         alert("Error, la receta no pudo ser procesada");
       }
     } catch (error) {
+      alert("Tu peso es: ",peso);
       console.error("Error en la carga:", error);
 
       if (error.response) {
@@ -144,7 +145,7 @@ const UploadComponent = () => {
     }
     setMensajeError("");
     setCuestionarioRespondido(true);
-    resetFormulario();
+    //resetFormulario();
   };
   return (
     <div className="flex max-w-6xl mx-auto p-6 gap-6">
