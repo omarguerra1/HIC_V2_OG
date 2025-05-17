@@ -2,7 +2,6 @@ import { useState } from 'react';
 const CardPaymentForm = () => {
     const [paymentMethod, setPaymentMethod] = useState('card'); // Default payment method is 'card'
     /**/
-
     return (
         <div className="max-w-6xl mx-auto px-4">
             <div className="mt-4 text-left" >

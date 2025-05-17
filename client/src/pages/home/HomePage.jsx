@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, Package, Bell, Mail, Clipboard } from 'lucide-react'; // Asegúrate de tener instalada la librería de iconos
+import { FileText, Package, Bell, Mail, Clipboard } from 'lucide-react'; //
 
 const HomePage = () => {
 
@@ -11,7 +11,6 @@ const HomePage = () => {
     const user = JSON.parse(localStorage.getItem("usuarioActual"));
     setCurrentUser(user);
   }, []);
-
   const handleOrderClick = (e) => {
     if (currentUser === null) {
       e.preventDefault();
@@ -20,7 +19,6 @@ const HomePage = () => {
       navigate("/cargar-receta");
     }
   }
-
   const handleMsgClick = (e) => {
     if (currentUser === null) {
       e.preventDefault();
@@ -29,8 +27,6 @@ const HomePage = () => {
       navigate("/messages");
     }
   }
-
-
   return (
     <div>
       <div></div>
@@ -47,9 +43,9 @@ const HomePage = () => {
               <Package size={48} className="text-green-600 mb-4" />
               <span className="text-xl font-semibold">Seguimiento de Pedido</span>
             </Link>
-            <Link to="/notifications" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
+            <Link to="/user-pagos" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
               <Bell size={48} className="text-red-600 mb-4" />
-              <span className="text-xl font-semibold">Notificaciones</span>
+              <span className="text-xl font-semibold">Historial de Pagos</span>
             </Link>
             <Link to="/messages" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
               onClick={(handleMsgClick)}>
@@ -63,11 +59,6 @@ const HomePage = () => {
               <Clipboard size={48} className="text-purple-600 mb-4" />
               <span className="text-xl font-semibold">Recetas</span>
             </Link>
-            <Link to="/ver_usuarios" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
-              onClick={(handleOrderClick)}>
-              <FileText size={48} className="text-blue-600 mb-4" />
-              <span className="text-xl font-semibold">Ver Usuarios</span>
-            </Link>
             <Link to="/ver_ordenes" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
               <Package size={48} className="text-green-600 mb-4" />
               <span className="text-xl font-semibold">Ver Ordenes</span>
@@ -80,13 +71,15 @@ const HomePage = () => {
               <Mail size={48} className="text-yellow-600 mb-4" />
               <span className="text-xl font-semibold">Mensajes</span>
             </Link>
+            <Link to="/ver_usuarios" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
+              onClick={(handleOrderClick)}>
+              <FileText size={48} className="text-blue-600 mb-4" />
+              <span className="text-xl font-semibold">Ver Usuarios</span>
+            </Link>
           </div>
         )}
       </div>
     </div>
-
-
   )
 };
-
 export default HomePage;
