@@ -40,9 +40,16 @@ const Recetas = () => {
           }
     };
 
-    const handleSearch = () => {
-
+    const handleSearch = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await axios.get(`http://localhost:3000/prescriptions/get_prescription/${search}`);
+        setFoundPrescription(response.data);
+    } catch (error) {
+        alert("Receta no encontrada");
     }
+};
+
 
     const handleCreateOrder = async() => {
         try{
