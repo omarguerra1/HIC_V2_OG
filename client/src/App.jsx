@@ -63,7 +63,7 @@ const App = () => {
     setIsMenuOpen(false);
     if (option === "profile") {
       window.location.href = "/user-profile";
-    }  else if (option === "logout") {
+    } else if (option === "logout") {
       localStorage.removeItem("usuarioActual");
       setCurrentUser(null);
       window.location.href = "/";
@@ -78,18 +78,19 @@ const App = () => {
     <Router>
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
         {/* Ajuste del header */}
-        <header className="bg-fuchsia-900 text-white py-8 p-8 flex justify-between items-center w-full relative z-50">
+        <header className="bg-fuchsia-900 text-white py-4 px-4 sm:py-8 sm:px-8 flex justify-between items-center w-full relative z-50">
           <div className="flex items-center">
             <Link to="/">
-              <img src={logo} alt="Logo de la Empresa" className="w-32 mb-4 md:mb-0 ml-[65px]" />
+              <img src={logo} alt="Logo de la Empresa" className="w-20 sm:w-32" />
             </Link>
           </div>
+          {/* Contenedor de botón de usuario + campana siempre en fila */}
           <div className="flex items-center gap-4 relative">
             {/* Botón de login */}
             <div className="relative">
               <button
                 onClick={handleUserButton}
-                className="text-black bg-green-500 rounded-2xl px-4 py-1 hover:bg-yellow-400 motion-safe:hover:scale-110 transform transition-transform duration-300"
+                className="text-black bg-green-500 rounded-2xl px-4 py-1 hover:bg-yellow-400 motion-safe:hover:scale-110 transition-transform duration-300"
               >
                 {currentUser ? `Hola ${currentUser.name_}` : 'Iniciar Sesión'}
               </button>
@@ -123,7 +124,7 @@ const App = () => {
 
 
         {/* Ajustar el espacio para el contenido para que el header no se sobreponga */}
-        <main className="flex-grow container w-screen p-4">
+        <main className="flex-grow container w-screen p-4 flex items-center justify-center">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/ver_usuarios" element={<VerUsuarios />} />
@@ -144,7 +145,7 @@ const App = () => {
 
         {/* Footer */}
         <footer className="bg-gray-200 text-center px-4 w-screen">
-          <div className="flex flex-col md:flex-row justify-around items-start mt-8 space-y-6 md:space-y-0">
+          <div className="flex flex-col items-center md:flex-row md:justify-around md:items-start mt-8 space-y-6 md:space-y-0">
 
             <div className="flex flex-col items-center text-center">
               <img src={logofooter} alt="Hospital Infantil" className="w-32 mb-4" />
@@ -154,7 +155,7 @@ const App = () => {
               </p>
             </div>
 
-            <div className="text-left">
+            <div className="text-center md:text-left">
               <h3 className="font-bold mb-2 text-black">Sobre Nosotros</h3>
               <p className="font-semibold text-fuchsia-900">Misión, Visión y Valores</p>
               <p className="font-semibold text-fuchsia-900">Historia Hospital</p>
@@ -162,14 +163,14 @@ const App = () => {
               <p className="font-semibold text-fuchsia-900">Más información</p>
             </div>
 
-            <div className="text-left">
+            <div className="text-center md:text-left">
               <h3 className="font-bold text-black mb-2">Contacto</h3>
               <p className="font-semibold text-fuchsia-900">-------------</p>
               <p className="font-semibold text-fuchsia-900">-------------</p>
               <p className="font-semibold text-fuchsia-900">-------------</p>
             </div>
 
-            <div className="text-left">
+            <div className="text-center md:text-left">
               <h3 className="font-bold text-black mb-2">Redes Sociales</h3>
               <div className="flex justify-start space-x-3 mt-3">
                 <a href="#" target="_blank" rel="noopener noreferrer">

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import OrderTracking from "./OrderTracking"; // Importamos el componente reutilizable
 
 const SeguimientoPedido = memo(() => {
