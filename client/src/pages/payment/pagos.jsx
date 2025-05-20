@@ -1,23 +1,24 @@
 import { useState } from 'react';
 import axios from "axios";
 
-const handlePayment = async (method) => {
+const handlePayment = async (tipoPago) => {
     const userMatricula = "12345678";
-    const pago = method === "ventanilla" ? "Pago en Ventanilla" : "Pago por Transferencia Bancaria";
+    const pago = tipoPago === "ventanilla" ? "$245" : "$245";
     const medicamentos = ["Amoxicilina", "Paracetamol"];
 
     try {
         const response = await axios.post("http://localhost:3000/pdf/generate-pdf", {
             userMatricula,
             pago,
-            medicamentos
-        }, { responseType: 'arraybuffer' });  // ✅ Cambiar de 'blob' a 'arraybuffer'
+            medicamentos,
+            tipoPago  // ✅ Envía el tipo de pago
+        }, { responseType: 'arraybuffer' });
 
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `recibo_${userMatricula}.pdf`;
+        a.download = tipoPago === "ventanilla" ? `recibo_ventanilla_${userMatricula}.pdf` : `recibo_transferencia_${userMatricula}.pdf`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -157,18 +158,14 @@ const CardPaymentForm = () => {
                                 <p>Por el momento solo se aceptan pagos en ventanilla y por medio de transferencia bancaria.</p>
 
                                 <div className="flex space-x-4">
-                                    <button
-                                        onClick={() => handlePayment('ventanilla')}
-                                        className="flex-1 p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-500 hover:text-white"
-                                    >
-                                        Pago en Ventanilla
+                                    <button onClick={() => handlePayment('ventanilla')} className="bg-blue-500 text-white px-4 py-2 rounded">
+                                        Generar PDF - Pago en Ventanilla
                                     </button>
-                                    <button
-                                        onClick={() => handlePayment('transferencia')}
-                                        className="flex-1 p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-green-500 hover:text-white"
-                                    >
-                                        Pago por Transferencia Bancaria
+
+                                    <button onClick={() => handlePayment('transferencia')} className="bg-green-500 text-white px-4 py-2 rounded">
+                                        Generar PDF - Pago por Transferencia
                                     </button>
+
                                 </div>
                             </div>
                         )}
