@@ -1,4 +1,33 @@
 import { useState } from 'react';
+import axios from "axios";
+
+const handlePayment = async (method) => {
+    const userMatricula = "12345678";
+    const pago = method === "ventanilla" ? "Pago en Ventanilla" : "Pago por Transferencia Bancaria";
+    const medicamentos = ["Amoxicilina", "Paracetamol"];
+
+    try {
+        const response = await axios.post("http://localhost:3000/pdf/generate-pdf", {
+            userMatricula,
+            pago,
+            medicamentos
+        }, { responseType: 'arraybuffer' });  // ✅ Cambiar de 'blob' a 'arraybuffer'
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `recibo_${userMatricula}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+    } catch (error) {
+        console.error("Error al generar el PDF:", error);
+        alert("Hubo un problema al generar el recibo");
+    }
+};
+
 const CardPaymentForm = () => {
     const [paymentMethod, setPaymentMethod] = useState('card'); // Default payment method is 'card'
     /**/
@@ -125,48 +154,32 @@ const CardPaymentForm = () => {
                         ) : (
                             // Formulario para pago en efectivo
                             <div className="space-y-4">
-                                <p>Recibirás un folio y código QR para pagar en efectivo en el hospital o farmacia.</p>
-                                <div className="mb-4">
-                                    <label
-                                        htmlFor="patient-name"
-                                        className="mb-2 block text-sm font-medium text-gray-900"
-                                    >
-                                        Nombre del paciente*
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="patient-name"
-                                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
-                                        placeholder="Juan Pérez"
-                                        required
-                                    />
-                                </div>
+                                <p>Por el momento solo se aceptan pagos en ventanilla y por medio de transferencia bancaria.</p>
 
-                                <div className="mb-4">
-                                    <label
-                                        htmlFor="contact-info"
-                                        className="mb-2 block text-sm font-medium text-gray-900"
+                                <div className="flex space-x-4">
+                                    <button
+                                        onClick={() => handlePayment('ventanilla')}
+                                        className="flex-1 p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-500 hover:text-white"
                                     >
-                                        Teléfono o correo para recibir instrucciones*
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="contact-info"
-                                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
-                                        placeholder="juan.perez@mail.com"
-                                        required
-                                    />
+                                        Pago en Ventanilla
+                                    </button>
+                                    <button
+                                        onClick={() => handlePayment('transferencia')}
+                                        className="flex-1 p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-green-500 hover:text-white"
+                                    >
+                                        Pago por Transferencia Bancaria
+                                    </button>
                                 </div>
                             </div>
                         )}
 
                         {/* Botón de pago */}
-                        <button
+                        {/*<button
                             type="submit"
                             className="flex w-full items-center justify-center rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300"
                         >
                             Confirmar Pago
-                        </button>
+                        </button>*/}
                     </form>
                 </div>
             </div>
