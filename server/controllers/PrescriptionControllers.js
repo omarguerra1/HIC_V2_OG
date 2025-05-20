@@ -61,10 +61,9 @@ export const createPrescription = async (req, res) => {
         return res.status(400).json({ message: "No se ha subido ninguna imagen." });
     }
     // Array de sabores desde form-data
-    const flavors = Array.isArray(req.body.flavors)
-    req.body.flavors
-    [req.body.flavors];
-    const { user_id, flavor, nombre_completo, peso, fecha_de_nacimiento, padecimiento, i_lactosa } = req.body; //edition from here
+    const flavor = JSON.stringify(req.body.flavor || []);
+    console.log("Flavors recibidos:", flavors);
+    const { user_id, nombre_completo, peso, fecha_de_nacimiento, padecimiento, i_lactosa } = req.body; //edition from here
     const imageUrl = `/uploads/${req.file.filename}`; // La URL de la imagen
 
     // Validamos los campos obligatorios
