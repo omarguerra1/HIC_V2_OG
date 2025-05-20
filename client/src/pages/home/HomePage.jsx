@@ -28,54 +28,236 @@ const HomePage = () => {
     }
   }
   return (
-    <div>
-      <div></div>
-      <div className="flex flex-col items-center justify-center h-full mt-6 mb-6">
-        <h2 className="text-3xl font-bold mb-8">Hospital Infantil de las Californias</h2>
-        {currentUser === null || currentUser.role === "general" ? (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> {/* Cambio de 2 a 3 columnas */}
-            <Link to="/cargar-receta" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
-              onClick={(handleOrderClick)}>
-              <FileText size={48} className="text-blue-600 mb-4" />
-              <span className="text-xl font-semibold">Subir Receta</span>
-            </Link>
-            <Link to="/seguimiento-pedido" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Package size={48} className="text-green-600 mb-4" />
-              <span className="text-xl font-semibold">Seguimiento de Pedido</span>
-            </Link>
-            <Link to="/user-pagos" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Bell size={48} className="text-red-600 mb-4" />
-              <span className="text-xl font-semibold">Historial de Pagos</span>
-            </Link>
-            <Link to="/messages" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
-              onClick={(handleMsgClick)}>
-              <Mail size={48} className="text-yellow-600 mb-4" />
-              <span className="text-xl font-semibold">Mensajes</span>
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Link to="/prescriptions" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Clipboard size={48} className="text-purple-600 mb-4" />
-              <span className="text-xl font-semibold">Recetas</span>
-            </Link>
-            <Link to="/ver_ordenes" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Package size={48} className="text-green-600 mb-4" />
-              <span className="text-xl font-semibold">Ver Ordenes</span>
-            </Link>
-            <Link to="/messages" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105">
-              <Mail size={48} className="text-yellow-600 mb-4" />
-              <span className="text-xl font-semibold">Mensajes</span>
-            </Link>
-            <Link to="/ver_usuarios" className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center transition duration-300 ease-in-out transform hover:scale-105"
-              onClick={(handleOrderClick)}>
-              <FileText size={48} className="text-blue-600 mb-4" />
-              <span className="text-xl font-semibold">Ver Usuarios</span>
-            </Link>
-          </div>
-        )}
+    <div className="flex flex-col items-center justify-center h-full mt-6 mb-6">
+      {/* Título */}
+      <h2 className="text-3xl sm:text-4xl lg:text-3x1 font-bold mb-8">
+        Hospital Infantil de las Californias
+      </h2>
+
+      {/* Wrapper que limita ancho en mediano (1366×768) y amplía en ultra-wide */}
+      <div className="w-full max-w-screen-lg 2xl:max-w-screen-2xl mx-auto px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+          {(!currentUser || currentUser.role === "general") ? (
+            <>
+              <Link
+                to="/cargar-receta"
+                onClick={handleOrderClick}
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <FileText className="
+                  text-blue-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Subir Receta
+                </span>
+              </Link>
+
+              <Link
+                to="/seguimiento-pedido"
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Package className="
+                  text-green-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Seguimiento de Pedido
+                </span>
+              </Link>
+
+              <Link
+                to="/user-pagos"
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Bell className="
+                  text-red-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Historial de Pagos
+                </span>
+              </Link>
+
+              <Link
+                to="/messages"
+                onClick={handleMsgClick}
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Mail className="
+                  text-yellow-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Mensajes
+                </span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/prescriptions"
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Clipboard className="
+                  text-purple-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Recetas
+                </span>
+              </Link>
+
+              <Link
+                to="/ver_ordenes"
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col	items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Package className="
+                  text-green-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Ver Ordenes
+                </span>
+              </Link>
+
+              <Link
+                to="/messages"
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col	items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <Mail className="
+                  text-yellow-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Mensajes
+                </span>
+              </Link>
+
+              <Link
+                to="/ver_usuarios"
+                onClick={handleOrderClick}
+                className="
+                  bg-white shadow-lg rounded-xl
+                  p-4 sm:p-6 md:p-8 lg:p-10 2xl:p-12
+                  w-full
+                  flex flex-col	items-center justify-center
+                  space-y-3 sm:space-y-4
+                  transition-transform transform hover:scale-105
+                "
+              >
+                <FileText className="
+                  text-blue-600
+                  w-10 h-10 sm:w-12 sm:h-12
+                  md:w-16 md:h-16
+                  lg:w-20 lg:h-20
+                  2xl:w-24 2xl:h-24
+                " />
+                <span className="
+                  text-base sm:text-lg md:text-xl lg:text-2xl 2xl:text-3xl
+                  font-semibold
+                ">
+                  Ver Usuarios
+                </span>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </div>
-  )
+  );
+
 };
 export default HomePage;

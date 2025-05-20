@@ -1,30 +1,25 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+
 import PrescriptionModel from "../models/PrescriptionModel.js";
 //multer para almacenar las imagenes en src/uploads
 // Configuración de multer para manejar la subida de imágenes
+// Multer para subir la imagen
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
-    },
+    destination: (req, file, cb) => cb(null, 'uploads/'),
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + '-' + file.originalname); // Nombre único del archivo
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
     }
 });
-
-const upload = multer({ storage });
-
-export const uploadImage = upload.single('image'); // Middleware para subir una sola imagen
+export const uploadImage = multer({ storage }).single('image');
 
 // Obtener todas las recetas
 export const getAllPrescriptions = async (req, res) => {
     try {
-        const{ page = 1, limit = 10 } = req.query;
-        const offset = (page - 1)*limit;
+        const { page = 1, limit = 10 } = req.query;
+        const offset = (page - 1) * limit;
 
-        const prescriptions = await PrescriptionModel.findAndCountAll({ 
+        const prescriptions = await PrescriptionModel.findAndCountAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
         });
@@ -33,7 +28,7 @@ export const getAllPrescriptions = async (req, res) => {
             prescriptions: prescriptions.rows,
             total: prescriptions.count,
             currentPage: parseInt(page),
-            totalPages: Math.ceil(prescriptions.count/limit)
+            totalPages: Math.ceil(prescriptions.count / limit)
         });
     } catch (error) {
         res.status(500).json({ message: "Error al obtener los usuarios: " + error.message });
@@ -55,52 +50,81 @@ export const getPrescription = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 export const createPrescription = async (req, res) => {
-    // Verificamos si se subió la imagen
+    // 1) Validar imagen
     if (!req.file) {
         return res.status(400).json({ message: "No se ha subido ninguna imagen." });
     }
-    // Array de sabores desde form-data
-    const flavor = JSON.stringify(req.body.flavor || []);
-    console.log("Flavors recibidos:", flavors);
-    const { user_id, nombre_completo, peso, fecha_de_nacimiento, padecimiento, i_lactosa } = req.body; //edition from here
-    const imageUrl = `/uploads/${req.file.filename}`; // La URL de la imagen
+    // 2) Extraer y normalizar sabores
+    let sabores;
+    // Si viene un array bajo el key `flavors`
+    if (req.body.flavors) {
+        sabores = Array.isArray(req.body.flavors)
+            ? req.body.flavors
+            : [req.body.flavors];
+    }
+    // Si viene un JSON string bajo el key `flavor`
+    else if (req.body.flavor) {
+        try {
+            const parsed = JSON.parse(req.body.flavor);
+            if (!Array.isArray(parsed)) throw new Error();
+            sabores = parsed;
+        } catch {
+            return res.status(400).json({
+                message: "El campo 'flavor' debe ser un JSON array válido."
+            });
+        }
+    } else {
+        return res.status(400).json({
+            message: "No se recibió ningún sabor ('flavors' o 'flavor')."
+        });
+    }
 
-    // Validamos los campos obligatorios
+    // 3) Desestructurar resto del body
+    const {
+        user_id,
+        nombre_completo,
+        peso,
+        fecha_de_nacimiento,
+        padecimiento,
+        i_lactosa
+    } = req.body;
+
+    // 4) Validaciones mínimas
     if (!user_id) {
         return res.status(400).json({ message: "Falta el ID del usuario." });
     }
-
-    // Validamos el formato de la imagen
     const validFormats = ['image/jpeg', 'image/png'];
     if (!validFormats.includes(req.file.mimetype)) {
         return res.status(400).json({ message: "Formato de imagen no válido." });
     }
 
+    const imageUrl = `/uploads/${req.file.filename}`;
+
     try {
-        // Creamos la nueva receta
+        // 5) Crear la receta (tu modelo debe declarar flavor: DataTypes.JSON)
         const newPrescription = await PrescriptionModel.create({
             user_id,
-            flavor: flavor,
-            image_url: imageUrl,  // Ruta de la imagen
-            image_format: req.file.mimetype,  // Formato de la imagen
-            image_size: req.file.size,  // Tamaño de la imagen //edition from here
-            flavors,     // guardamos el array JSON
+            flavor: JSON.stringify(sabores),     // ← aquí va tu array JSON
+            image_url: imageUrl,
+            image_format: req.file.mimetype,
+            image_size: req.file.size,
             nombre_completo,
             peso,
             fecha_de_nacimiento,
             padecimiento,
-            i_lactosa,
+            i_lactosa
         });
 
-        // Respondemos con éxito
-        res.status(201).json({
+        return res.status(201).json({
             message: "Receta creada correctamente.",
-            prescription: newPrescription,
+            prescription: newPrescription
         });
+
     } catch (error) {
         console.error("Error al crear la receta:", error);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 // Actualizar una receta existente

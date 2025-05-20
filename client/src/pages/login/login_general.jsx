@@ -60,7 +60,8 @@ const LoginGeneral = () => {
     };
 
     return (
-        <div className="login-form max-w-md mx-auto bg-white shadow-lg rounded-lg p-6 mt-10 mb-4 ">
+        
+        <div className="login-form mx-auto w-full px-4 sm:px-6 md:w-3/4 md:max-w-lg lg:w-2/5 xl:w-1/3 2xl:w-1/2 bg-white shadow-lg rounded-lg p-6 mt-10 mb-4">
             <h2 className="text-2xl font-bold mb-4 mt-4">Iniciar Sesión</h2>
             <div className="flex justify-center mb-6">
                 <img src={logo} alt="Usuario" className="w-24 h-24" />
