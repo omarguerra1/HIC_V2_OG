@@ -57,29 +57,24 @@ export const createPrescription = async (req, res) => {
         return res.status(400).json({ message: "No se ha subido ninguna imagen." });
     }
     // 2) Extraer y normalizar sabores
-    let sabores;
-    // Si viene un array bajo el key `flavors`
-    if (req.body.flavors) {
-        sabores = Array.isArray(req.body.flavors)
-            ? req.body.flavors
-            : [req.body.flavors];
+    // Extraer y normalizar sabores
+let flavors;
+if (req.body.flavors) {
+    flavors = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
+} else if (req.body.flavor) {
+    try {
+        const parsed = JSON.parse(req.body.flavor);
+        if (!Array.isArray(parsed)) throw new Error();
+        flavors = parsed;
+    } catch {
+        return res.status(400).json({ message: "El campo 'flavor' debe ser un JSON array válido." });
     }
-    // Si viene un JSON string bajo el key `flavor`
-    else if (req.body.flavor) {
-        try {
-            const parsed = JSON.parse(req.body.flavor);
-            if (!Array.isArray(parsed)) throw new Error();
-            sabores = parsed;
-        } catch {
-            return res.status(400).json({
-                message: "El campo 'flavor' debe ser un JSON array válido."
-            });
-        }
-    } else {
-        return res.status(400).json({
-            message: "No se recibió ningún sabor ('flavors' o 'flavor')."
-        });
-    }
+} else {
+    return res.status(400).json({ message: "No se recibió ningún sabor ('flavors' o 'flavor')." });
+}
+
+// **Ahora flavors está correctamente definido antes de usarlo**
+console.log("Flavors recibidos:", flavors);
 
     // 3) Desestructurar resto del body
     const {
@@ -106,7 +101,7 @@ export const createPrescription = async (req, res) => {
         // 5) Crear la receta (tu modelo debe declarar flavor: DataTypes.JSON)
         const newPrescription = await PrescriptionModel.create({
             user_id,
-            flavor: JSON.stringify(sabores),     // ← aquí va tu array JSON
+            flavor: JSON.stringify(flavors),     // ← aquí va tu array JSON //sabores - flavors
             image_url: imageUrl,
             image_format: req.file.mimetype,
             image_size: req.file.size,

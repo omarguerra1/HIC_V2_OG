@@ -10,6 +10,7 @@ import prescriptionsRoutes from "./routes/prescriptionsRoutes.js"
 import medicineRoutes from "./routes/medicamentoRoutes.js";
 import HistorialPagosRoutes from "./routes/HistorialPagosRoutes.js";
 import pdfRoutes from "./routes/pdfRoutes.js";
+import ordermedicamentosRoutes from "./routes/ordermedicamentosRoutes.js";
 import './database/associations.js';
 import {Server} from "socket.io";
 import http from "http";
@@ -40,6 +41,8 @@ app.use('/prescriptions', prescriptionsRoutes);
 app.use("/medicines", medicineRoutes);
 app.use("/historial_pagos", HistorialPagosRoutes);
 app.use('/pdf', pdfRoutes); // Registrar la ruta
+app.use("/order_medicamentos", ordermedicamentosRoutes);
+
 
 
 
