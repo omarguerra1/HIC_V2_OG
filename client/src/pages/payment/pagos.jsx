@@ -2,15 +2,27 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const handlePayment = async (tipoPago) => {
-    const userMatricula = "12345678";
+const handlePayment = async (tipoPago, orderData) => {
+    if (!orderData) {
+        alert("Error: No se han recibido los datos del pedido.");
+        return;
+    }
+
+    const userName = orderData.nombre_usuario;
+    const userMatricula = orderData.matricula;
+    const userOrderID = orderData.order_id;
     const pago = tipoPago === "ventanilla" ? "$245" : "$245";
-    const medicamentos = ["Amoxicilina", "Paracetamol"];
+    //const medicamentos = orderData.medicamentos;
+    const medicamentos = Array.isArray(orderData.medicamento) ? orderData.medicamento : [orderData.medicamento];  // ✅ Asegura que sea un array
+
+
 
     try {
         const response = await axios.post("http://localhost:3000/pdf/generate-pdf", {
+            userName,
             userMatricula,
             pago,
+            userOrderID,
             medicamentos,
             tipoPago  // ✅ Envía el tipo de pago
         }, { responseType: 'arraybuffer' });
@@ -86,9 +98,11 @@ const CardPaymentForm = () => {
                         <button onClick={() => setPaymentMethod('card')} className={`flex-1 p-2 text-sm font-medium text-center rounded-lg ${paymentMethod === 'card' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>
                             Tarjeta de Crédito/Débito
                         </button>
+
                         <button onClick={() => setPaymentMethod('cash')} className={`flex-1 p-2 text-sm font-medium text-center rounded-lg ${paymentMethod === 'cash' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}>
                             Pago en Efectivo
                         </button>
+
                     </div>
 
                     {/* Formulario de pago */}
@@ -107,10 +121,11 @@ const CardPaymentForm = () => {
                             <div className="space-y-4">
                                 <p>Por el momento solo se aceptan pagos en ventanilla y por medio de transferencia bancaria.</p>
                                 <div className="flex space-x-4">
-                                    <button onClick={() => handlePayment('ventanilla')} className="bg-blue-500 text-white px-4 py-2 rounded">
+                                    <button type="button" onClick={() => handlePayment('ventanilla', orderData)} className="bg-blue-500 text-white px-4 py-2 rounded">
                                         Generar PDF - Pago en Ventanilla
                                     </button>
-                                    <button onClick={() => handlePayment('transferencia')} className="bg-green-500 text-white px-4 py-2 rounded">
+
+                                    <button type="button" onClick={() => handlePayment('transferencia', orderData)} className="bg-green-500 text-white px-4 py-2 rounded">
                                         Generar PDF - Pago por Transferencia
                                     </button>
                                 </div>
