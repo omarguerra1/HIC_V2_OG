@@ -11,11 +11,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 router.post('/generate-pdf', async (req, res) => {
-    const { userMatricula, pago, medicamentos } = req.body;
+    const { userMatricula, pago, medicamentos, tipoPago } = req.body;
 
     try {
-        // Cargar plantilla PDF existente
-        const templatePath = path.join(__dirname, '..', 'uploads', 'HOJA_DE_PAGO#1.pdf');
+        let templateFile = '';  // Determinar la plantilla según el tipo de pago
+        if (tipoPago === 'ventanilla') {
+            templateFile = 'HOJA_DE_PAGO#1.pdf';  // Sigue siendo la misma
+        } else if (tipoPago === 'transferencia') {
+            templateFile = 'HOJA_DE_PAGO#2.pdf';  // Nueva plantilla
+        } else {
+            return res.status(400).json({ success: false, message: "Tipo de pago inválido" });
+        }
+
+        const templatePath = path.join(__dirname, '..', 'uploads', templateFile);
         if (!fs.existsSync(templatePath)) {
             return res.status(404).json({ success: false, message: "Archivo de plantilla no encontrado" });
         }
@@ -25,23 +33,19 @@ router.post('/generate-pdf', async (req, res) => {
         const firstPage = pdfDoc.getPages()[0];
 
         // Agregar datos al PDF
-        firstPage.drawText(`Matrícula: ${userMatricula}`, { x: 100, y: 700, size: 12 });
-        firstPage.drawText(`Pago: ${pago}`, { x: 100, y: 680, size: 12 });
-        firstPage.drawText(`Medicamentos: ${medicamentos.join(', ')}`, { x: 100, y: 660, size: 12 });
+        firstPage.drawText(`${userMatricula}`, { x: 125, y: 595, size: 11 });
+        firstPage.drawText(`${pago}`, { x: 145, y: 128, size: 11 });
+        firstPage.drawText(`${medicamentos.join(', ')}`, { x: 72, y: 500, size: 11 });
 
-        // Guardar el nuevo PDF
-        const modifiedPdfBytes = await pdfDoc.save();
-        console.log("Tamaño del PDF generado:", modifiedPdfBytes.length);
-        const outputPath = path.join(__dirname, '..', 'uploads', `recibo_${userMatricula}.pdf`);
-        fs.writeFileSync(outputPath, modifiedPdfBytes);
+        // Guardar el nuevo PDF con nombres distintos según el tipo de pago
+        const outputFile = tipoPago === 'ventanilla' ? `recibo_ventanilla_${userMatricula}.pdf` : `recibo_transferencia_${userMatricula}.pdf`;
+        const outputPath = path.join(__dirname, '..', 'uploads', outputFile);
+        fs.writeFileSync(outputPath, await pdfDoc.save());
 
-        // **Enviar el archivo al frontend para descarga**
-        //res.setHeader('Content-Type', 'application/pdf');
-        //res.setHeader('Content-Disposition', `attachment; filename=recibo_${userMatricula}.pdf`);
-        //res.send(modifiedPdfBytes);
+        // **Enviar el archivo al frontend**
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=recibo_${userMatricula}.pdf`);
-        res.send(Buffer.from(modifiedPdfBytes));  // ✅ Convertir los datos en un Buffer
+        res.setHeader('Content-Disposition', `attachment; filename=${outputFile}`);
+        res.send(Buffer.from(await pdfDoc.save()));
 
     } catch (error) {
         console.error("Error al generar el PDF:", error);

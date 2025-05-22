@@ -56,7 +56,6 @@ export const createPrescription = async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "No se ha subido ninguna imagen." });
     }
-
     // 2) Extraer y normalizar sabores
     let sabores;
     // Si viene un array bajo el key `flavors`
