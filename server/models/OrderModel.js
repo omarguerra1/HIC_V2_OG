@@ -20,6 +20,10 @@ const OrderModel = db.define('order', {
         type: DataTypes.ENUM('Preparando', 'Lista', 'Entregada', 'Cancelada'),
         defaultValue: 'Preparando',
     },
+    estado_pago: {
+        type: DataTypes.ENUM('Pagada', 'Sin Pagar'),
+        defaultValue: 'Preparando',
+    },
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

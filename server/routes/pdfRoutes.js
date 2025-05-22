@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 router.post('/generate-pdf', async (req, res) => {
-    const { userMatricula, pago, medicamentos, tipoPago } = req.body;
+    const { userName, userMatricula, pago, userOrderID, medicamentos, tipoPago } = req.body;
 
     try {
         let templateFile = '';  // Determinar la plantilla según el tipo de pago
@@ -33,7 +33,9 @@ router.post('/generate-pdf', async (req, res) => {
         const firstPage = pdfDoc.getPages()[0];
 
         // Agregar datos al PDF
+        firstPage.drawText(`${userName}`, {x: 110, y: 653, size: 11});
         firstPage.drawText(`${userMatricula}`, { x: 125, y: 595, size: 11 });
+        firstPage.drawText(`${userOrderID}`, { x: 146, y: 565, size: 11 });
         firstPage.drawText(`${pago}`, { x: 145, y: 128, size: 11 });
         firstPage.drawText(`${medicamentos.join(', ')}`, { x: 72, y: 500, size: 11 });
 
