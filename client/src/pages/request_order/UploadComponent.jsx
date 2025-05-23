@@ -28,7 +28,7 @@ const UploadComponent = () => {
   const [intoleranciaLactosa, setIntoleranciaLactosa] = useState("");
   const [tieneFoto, setTieneFoto] = useState("");
   const [cuestionarioRespondido, setCuestionarioRespondido] = useState(false);
-  const [mensajeError, setMensajeError] = useState("");
+  const [setMensajeError] = useState("");
 
   // Usuario
   const [currentUser, setCurrentUser] = useState(null);

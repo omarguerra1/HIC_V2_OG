@@ -52,5 +52,15 @@ MedicineModel.belongsTo(PrescriptionModel, {
 PrescriptionModel.hasMany(MedicineModel, {
     foreignKey: "prescription_id"
 });
+// Una Orden “pertenece” a una Receta, por prescription_id
+OrderModel.belongsTo(PrescriptionModel, {
+  foreignKey: 'prescription_id',
+  as:         'receta'
+});
 
+// Y una Receta puede tener múltiples Órdenes (aunque en tu caso podría ser 1:1)
+PrescriptionModel.hasMany(OrderModel, {
+  foreignKey: 'prescription_id',
+  as:         'ordenes'
+});
 export { UserModel, OrderModel, MessageModel, PrescriptionModel, MedicineModel, HistorialPagos };

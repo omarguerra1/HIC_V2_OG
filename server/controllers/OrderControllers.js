@@ -1,68 +1,86 @@
 import OrderModel from "../models/OrderModel.js";
 import UserModel from "../models/UserModel.js";
+import MedicamentoModel from "../models/MedicamentoModel.js";
 
-// Obtener todos los pedidos
 export const getAllOrders = async (req, res) => {
-    try {
-        const{ page = 1, limit = 10 } = req.query;
-        const offset = (page - 1)*limit;
+  try {
+    const { page = 1, limit = 10, user_id } = req.query;
+    const offset = (page - 1) * limit;
 
-        const orders = await OrderModel.findAndCountAll({ 
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-        });
-
-        res.status(200).json({
-            orders: orders.rows,
-            total: orders.count,
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(orders.count/limit)
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Error al obtener las ordenes: " + error.message });
+    // Construir el WHERE dinámico
+    const where = {};
+    if (user_id) {
+      where.user_id = user_id;
     }
+
+    const orders = await OrderModel.findAndCountAll({
+      where,                           // ← ahora filtra por user_id
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['order_date', 'DESC']]
+    });
+
+    return res.status(200).json({
+      orders: orders.rows,
+      total: orders.count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(orders.count / limit)
+    });
+  } catch (error) {
+    console.error('Error al obtener las órdenes:', error);
+    return res.status(500).json({ message: error.message });
+  }
 };
+
 
 //Obtener un pedido especifico
 export const getOneOrder = async (req, res) => {
-    const { order_id } = req.params; // Parámetro de la URL
-    try {
-        const order = await OrderModel.findOne({ where: { order_id: order_id } });
-
-        if (!order) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Orden no encontrada" // Asegurarse de que el pedido no esté vacío
-            });
+  const { order_id } = req.params;
+  try {
+    const order = await OrderModel.findOne({
+      where: { order_id },
+      include: [
+        {
+          model: MedicamentoModel,
+          as:    'medicamentos',
+          attributes: [
+            'medicamento_id',
+            'nombre',
+            'flavor',
+            'dosis',
+            'frecuencia'
+          ]
         }
+      ]
+    });
 
-        const order_user = await UserModel.findOne({ where: { user_id: order.user_id } });
-
-        if (!order_user) {
-            return res.status(404).json({
-                success: false,
-                message: "Usuario no encontrado" // Validar que el usuario asociado exista
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            order: {
-                order_id: order.order_id,
-                username: order_user.name_,
-                user_id: order.user_id,
-                state: order.state,
-                order_date: order.order_date,
-                delivery_schedule: order.delivery_schedule,
-            },
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al buscar la orden",
-            error: error.message, // Detalle del error para depuración
-        });
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Orden no encontrada"
+      });
     }
+
+    res.status(200).json({
+      success: true,
+      order: {
+        order_id:          order.order_id,
+        user_id:           order.user_id,
+        state:             order.state,
+        estado_pago:       order.estado_pago,
+        order_date:        order.order_date,
+        delivery_schedule: order.delivery_schedule,
+        medicamentos:      order.medicamentos   // ← aquí ya tienes el array
+      }
+    });
+  } catch (error) {
+    console.error("Error al buscar la orden:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al buscar la orden",
+      error:   error.message
+    });
+  }
 };
 export const createOrder = async (req, res) => {
     const { user_id, prescription_id } = req.body; // ahora debes incluir prescription_id en el body

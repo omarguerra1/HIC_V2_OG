@@ -113,9 +113,8 @@ const HistorialOrdenes = () => {
           <thead>
             <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
               <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("order_id")}>
-                ID {getSortIcon("order_id")}
+                Orden ID {getSortIcon("order_id")}
               </th>
-              <th className="py-3 px-6 text-left">Prescripción</th>
               <th className="py-3 px-6 text-left cursor-pointer" onClick={() => handleSort("amount")}>
                 Importe {getSortIcon("amount")}
               </th>
@@ -136,11 +135,23 @@ const HistorialOrdenes = () => {
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-300"
                 >
                   <td className="py-3 px-6 text-left">{order.order_id}</td>
-                  <td className="py-3 px-6 text-left">{order.prescription_id || "Sin detalles"}</td>
                   <td className="py-3 px-6 text-left">${order.amount || "0.00"}</td>
                   <td className="py-3 px-6 text-left">{order.order_date}</td>
                   <td className="py-3 px-6 text-left">{order.user_name || "Cliente N/D"}</td>
-                  <td className="py-3 px-6 text-left">{order.state}</td>
+                  <td className="py-3 px-6 text-left">
+                    <span
+                      className={
+                        `${order.state === 'Entregada' ? 'bg-green-200 text-green-600' :
+                          order.state === 'Preparando' ? 'bg-yellow-200 text-yellow-600' :
+                          order.state === 'Lista'      ? 'bg-blue-200 text-blue-600' :
+                          order.state === 'Cancelada'  ? 'bg-red-200 text-red-600' :
+                          'bg-gray-200 text-gray-600'
+                        } py-1 px-3 rounded-full text-xs`
+                      }
+                    >
+                      {order.state}
+                    </span>
+                  </td>
                 </tr>
               ))
             ) : (
