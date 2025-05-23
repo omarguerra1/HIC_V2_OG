@@ -1,47 +1,46 @@
-
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 const OrderTracking = () => {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState({
-    inProcess: [],
-    paid: []
-  });
+  const [orders, setOrders] = useState({ inProcess: [], paid: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulando la carga de datos del usuario actual
     const fetchUserOrders = async () => {
       try {
-        // En una implementación real, aquí harías la llamada a tu API
-        // con el ID del usuario actual para obtener sus pedidos
-        const user = JSON.parse(localStorage.getItem("usuarioActual"));
+        // 1) Obtener user_id (ajusta según tu login)
+        const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
+        if (!usuario) throw new Error('Usuario no autenticado');
+        const user_id = usuario.user_id;
 
-        if (user) {
-          // Ejemplo de datos simulados que coinciden con la imagen
-          const mockOrders = {
-            inProcess: [
-              { id: 123, status: "Aprobado", amount: 120.00, currency: "MXN" },
-              { id: 125, status: "Aprobado", amount: 100.00, currency: "MXN" }
-            ],
-            paid: [
-              { id: 127, status: "Preparando" },
-              { id: 128, status: "Entregado" }
-            ]
-          };
+        // 2) Llamar al endpoint CORRECTO (/order) y enviar user_id
+        const { data } = await axios.get(
+          'http://localhost:3000/order',      // ← singular
+          {
+            params: {
+              page: 1,
+              limit: 100,
+              user_id                    // ← para que el backend filtre
+            }
+          }
+        );
 
-          setOrders(mockOrders);
-        }
-        setLoading(false);
+        // 3) Separar según estado de pago
+        const inProcess = data.orders.filter(o => o.estado_pago === 'Sin Pagar');
+        const paid = data.orders.filter(o => o.estado_pago === 'Pagada');
+        setOrders({ inProcess, paid });
       } catch (error) {
-        console.error("Error al cargar los pedidos:", error);
+        console.error('Error al cargar los pedidos:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchUserOrders();
   }, []);
-
+  if (loading) return <div className="p-4">Cargando pedidos...</div>;
   const handlePayNow = (orderId) => {
     navigate(`/pagar/${orderId}`);
   };
@@ -51,27 +50,32 @@ const OrderTracking = () => {
   }
 
   return (
-    <div className="flex flex-row justify-between p-4 max-w-6xl mx-auto h-auto gap-8">
-      <div className="mt-4 text-left" >
+    <div className="flex flex-wrap justify-center p-4 max-w-6xl mx-auto gap-8">
+      {/* Botón Regresar */}
+      <div className="w-full text-left">
         <button
           onClick={() => window.history.back()}
-          className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center">
+          className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center"
+        >
           <span className="mr-2">←</span> Regresar
         </button>
       </div>
-      <div className="bg-white rounded-lg shadow-md p-6 w-1/2 mt-6">
-        <div>
-          
-        </div>
-        <h1 className="text-2xl font-bold mb-6 ">Pedidos en Proceso</h1>
+
+      {/* Pedidos sin pagar (en proceso) */}
+      <div className="bg-white rounded-lg shadow-md p-6 w-full md:w-5/12">
+        <h1 className="text-2xl font-bold mb-6">Pedidos en Proceso</h1>
         {orders.inProcess.length > 0 ? (
-          orders.inProcess.map((order) => (
-            <div key={order.id} className="mb-6 pb-6 border-b bg-gray-300 rounded-lg">
-              <h2 className="text-xl font-semibold">Pedido #{order.id} - {order.status}</h2>
-              <p className="my-2">Total ${order.amount.toFixed(2)} {order.currency}</p>
+          orders.inProcess.map(order => (
+            <div key={order.order_id} className="mb-6 pb-6 border-b bg-gray-100 rounded-lg p-4">
+              <h2 className="text-xl font-semibold">
+                Pedido #{order.order_id} – {order.state}
+              </h2>
+              <p className="text-sm text-gray-600">
+                Fecha de pedido: {new Date(order.order_date).toLocaleString()}
+              </p>
               <button
-                onClick={() => handlePayNow(order.id)}
-                className="bg-black text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                onClick={() => handlePayNow(order.order_id)}
+                className="mt-3 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition"
               >
                 Pagar Ahora
               </button>
@@ -82,17 +86,23 @@ const OrderTracking = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 w-1/2 mt-6">
+      {/* Pedidos pagados */}
+      <div className="bg-white rounded-lg shadow-md p-6 w-full md:w-5/12">
         <h1 className="text-2xl font-bold mb-6">Pedidos Pagados</h1>
         {orders.paid.length > 0 ? (
-          <div className="space-y-6">
-            {orders.paid.map((order) => (
-              <div key={order.id} className="pb-4 border-b bg-gray-300 rounded-lg">
-                <h3 className="font-bold text-lg">Pedido #{order.id}</h3>
-                <p className="mt-1"><span className="font-semibold">Estado:</span> {order.status}</p>
-              </div>
-            ))}
-          </div>
+          orders.paid.map(order => (
+            <div key={order.order_id} className="mb-6 pb-4 border-b bg-gray-100 rounded-lg p-4">
+              <h3 className="font-bold text-lg">
+                Pedido #{order.order_id}
+              </h3>
+              <p className="mt-1">
+                <span className="font-semibold">Estado:</span> {order.state}
+              </p>
+              <p className="text-sm text-gray-600">
+                Fecha de pedido: {new Date(order.order_date).toLocaleString()}
+              </p>
+            </div>
+          ))
         ) : (
           <p>No tienes pedidos pagados.</p>
         )}

@@ -52,7 +52,7 @@ const Recetas = () => {
       );
       setPrescriptions(presWithNames);
       setTotalPages(data.totalPages);
-    } catch (error){
+    } catch (error) {
       console.error(error);
       alert("No se pudo obtener la información de las recetas");
     }
@@ -131,9 +131,13 @@ const Recetas = () => {
       alert("Error al guardar medicamentos o crear la orden");
     }
   };
-
+  // bloquea scroll de body cuando el modal está abierto
+  useEffect(() => {
+    document.body.style.overflow = preMsgOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [preMsgOpen])
   return (
-    <div className="flex flex-col items-center p-6">
+    <div className={`flex flex-col items-center p-6 ${preMsgOpen ? 'overflow-hidden h-screen' : ''}`}>
       <h2 className="text-3xl font-bold mb-6">Recetas en el Sistema</h2>
 
       <form onSubmit={handleSearch} className="mb-4">
@@ -158,10 +162,7 @@ const Recetas = () => {
             <div>
               <p><strong>ID:</strong> {p.prescription_id}</p>
               <p><strong>Paciente:</strong> {p.patient_name}</p>
-              <p>
-                <strong>Sabores:</strong>{" "}
-                {(p.flavors || []).join(", ")}
-              </p>
+              <p><strong>Sabores:</strong> {(p.flavors || []).join(", ")}</p>
               <p><strong>Fecha:</strong> {p.upload_date}</p>
             </div>
             <button
@@ -174,10 +175,9 @@ const Recetas = () => {
         ))}
       </ul>
 
-      {/* Modal */}
       {preMsgOpen && foundPrescription && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-md shadow-lg w-1/2 p-6 relative">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-40 overflow-auto">
+          <div className="bg-white rounded-md shadow-lg w-1/2 mx-auto mt-48 max-h-[90vh] p-6 relative overflow-y-auto">
             <button
               onClick={() => setPreMsg(false)}
               className="absolute top-3 right-3 bg-red-500 text-white rounded-full px-3 py-1 hover:bg-red-700"
@@ -192,7 +192,7 @@ const Recetas = () => {
               className="w-full h-64 object-contain mb-4"
             />
 
-            {(foundPrescription.flavors || []).map((sabor, i) => (
+            {foundPrescription.flavors.map((sabor, i) => (
               <div key={i} className="mb-4 border-b pb-4">
                 <p className="mb-2">
                   <strong>Sabor {i + 1}:</strong> {sabor}
@@ -239,7 +239,6 @@ const Recetas = () => {
         </div>
       )}
 
-      {/* Paginación */}
       <div className="flex items-center space-x-4 mt-4">
         <button
           onClick={() => setPage(p => Math.max(p - 1, 1))}

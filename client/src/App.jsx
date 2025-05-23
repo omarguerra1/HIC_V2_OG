@@ -79,49 +79,107 @@ const App = () => {
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
         {/* Ajuste del header */}
         <header className="bg-fuchsia-900 text-white py-4 px-4 sm:py-8 sm:px-8 flex justify-between items-center w-full relative z-50">
-          <div className="flex items-center">
-            <Link to="/">
-              <img src={logo} alt="Logo de la Empresa" className="w-20 sm:w-32" />
-            </Link>
-          </div>
-          {/* Contenedor de botón de usuario + campana siempre en fila */}
-          <div className="flex items-center gap-4 relative">
-            {/* Botón de login */}
-            <div className="relative">
-              <button
-                onClick={handleUserButton}
-                className="text-black bg-green-500 rounded-2xl px-4 py-1 hover:bg-yellow-400 motion-safe:hover:scale-110 transition-transform duration-300"
+          <Link to="/">
+            <img src={logo} alt="Logo" className="w-24 sm:w-32" />
+          </Link>
+
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowNotifications(v => !v)}
+              className="bg-black p-2 rounded-full hover:bg-gray-800 transition"
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
               >
-                {currentUser ? `Hola ${currentUser.name_}` : 'Iniciar Sesión'}
-              </button>
-              {isMenuOpen && currentUser && (
-                <div className="absolute right-0 mt-2 w-48 bg-blue-500 border border-gray-300 rounded-lg shadow-lg z-50">
-                  <ul>
-                    <li className="px-4 py-2 hover:bg-blue-700 cursor-pointer rounded-lg" onClick={() => handleMenuOption("profile")}>Ver Perfil</li>
-                    <li className="px-4 py-2 hover:bg-blue-700 cursor-pointer rounded-lg" onClick={() => handleMenuOption("logout")}>Cerrar Sesión</li>
-                  </ul>
-                </div>
-              )}
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 
+             14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 
+             10-4 0v1.341C8.67 6.165 8 7.388 8 
+             8.75v5.408c0 .538-.214 1.055-.595 
+             1.437L6 17h5m4 0v1a3 3 0 
+             01-6 0v-1m6 0H9"
+                />
+              </svg>
+            </button>
 
-            {/* Icono de notificaciones */}
-            <div className="relative">
-              <button onClick={handleNotificationClick} className="hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C8.67 6.165 8 7.388 8 8.75v5.408c0 .538-.214 1.055-.595 1.437L6 17h5m4 0v1a3 3 0 01-6 0v-1m6 0H9" />
-                </svg>
-              </button>
-
-              {/* Panel de notificaciones */}
-              {showNotifications && (
-                <div className="absolute top-12 right-0 z-50">
-                  <NotificationsPanel onClose={() => setShowNotifications(false)} />
-                </div>
-              )}
-            </div>
+            <button
+              onClick={handleUserButton}
+              className="bg-fuchsia-500 text-white rounded-2xl px-4 py-1 hover:bg-fuchsia-600 transition"
+            >
+              {currentUser ? `Hola ${currentUser.name_}` : 'Iniciar Sesión'}
+            </button>
           </div>
-        </header>
 
+          {showNotifications && (
+            <div className="absolute top-28 right-0 z-50">
+              <NotificationsPanel onClose={() => setShowNotifications(false)} />
+            </div>
+          )}
+
+          {isMenuOpen && currentUser && (
+            <div className="absolute top-16 right-0 mt-1 w-48 bg-fuchsia-500 hover:bg-fuchsia-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 z-50">
+              <div className="flex items-center px-4 py-3 border-b border-black">
+                <img
+                  src="https://i.pravatar.cc/40"
+                  alt="avatar"
+                  className="w-8 h-8 rounded-full"
+                />
+                <span className="ml-3 font-semibold text-white">
+                  {currentUser.name_}
+                </span>
+              </div>
+              <ul>
+                <li
+                  className="flex items-center px-4 py-2 hover:bg-gray-600 cursor-pointer text-white"
+                  onClick={() => handleMenuOption('profile')}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.121 17.804A13.937 13.937 0 0112 
+                 15c2.967 0 5.69 1 7.879 2.804M12 
+                 3a4 4 0 110 8 4 4 0 010-8z"
+                    />
+                  </svg>
+                  Ver Perfil
+                </li>
+                <li
+                  className="flex items-center px-4 py-2 hover:bg-gray-600 cursor-pointer text-white"
+                  onClick={() => handleMenuOption('logout')}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 
+                 4v1a3 3 0 01-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                  Cerrar Sesión
+                </li>
+              </ul>
+            </div>
+          )}
+        </header>
 
         {/* Ajustar el espacio para el contenido para que el header no se sobreponga */}
         <main className="flex-grow container w-screen p-4 flex items-center justify-center">

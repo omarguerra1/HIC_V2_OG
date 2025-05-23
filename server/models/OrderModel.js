@@ -1,7 +1,7 @@
 import db from "../database/db.js";
 import { DataTypes, Sequelize } from "sequelize";
 import UserModel from "./UserModel.js"
-
+import MedicamentoModel from "./MedicamentoModel.js"; 
 const OrderModel = db.define('order', {
     order_id: {
         type: DataTypes.INTEGER,
@@ -22,8 +22,8 @@ const OrderModel = db.define('order', {
     },
     estado_pago: {
         type: DataTypes.ENUM('Pagada', 'Sin Pagar'),
-        defaultValue: 'Preparando',
-    },
+        defaultValue: 'Sin Pagar',      // aquí
+  },
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -35,6 +35,12 @@ const OrderModel = db.define('order', {
     },
 }, {
     timestamps: true,
+});
+// 1 Order → N Medicamentos (por prescription_id)
+OrderModel.hasMany(MedicamentoModel, {
+  foreignKey: 'prescription_id',
+  sourceKey:  'prescription_id',
+  as:         'medicamentos'
 });
 
 export default OrderModel;

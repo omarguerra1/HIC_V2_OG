@@ -1,6 +1,6 @@
 import db from "../database/db.js";
 import { DataTypes } from "sequelize";
-
+import OrderModel from "./OrderModel.js";  // importa el modelo
 const MedicamentoModel = db.define('medicamentos', {
     medicamento_id: {
         type: DataTypes.INTEGER,
