@@ -8,6 +8,12 @@ const Recetas = () => {
   const [search, setSearch] = useState("");
   const [preMsgOpen, setPreMsg] = useState(false);
   const [foundPrescription, setFoundPrescription] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState([]);
+  const [bubbleOpen, setBubbleOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+  // <p><strong>Peso:</strong> {selectedPatient.flavors.join(", ")}</p>
 
   // Arrays paralelos para captura
   const [medNames, setMedNames] = useState([]);
@@ -130,7 +136,11 @@ const Recetas = () => {
       alert("Error al guardar medicamentos o crear la orden");
     }
   };
-
+  // bloquea scroll de body cuando el modal está abierto
+  useEffect(() => {
+    document.body.style.overflow = preMsgOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [preMsgOpen])
   return (
     <div className={`flex flex-col items-center p-6 ${preMsgOpen ? 'h-screen' : ''}`}>
       <h2 className="text-3xl font-bold mb-6">Recetas en el Sistema</h2>
@@ -245,8 +255,35 @@ const Recetas = () => {
               >
                 Cancelar
               </button>
+              <button
+                onClick={() => {
+                  setBubbleOpen(true);
+                  setSelectedPatient(foundPrescription);
+                }}
+                className="bg-purple-600 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-md hover:bg-purple-700 transition">
+                <span>Ver Datos del Paciente</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-6 h-6" viewBox="0 0 24 24">
+                  <path d="M2 4v16h20V4H2zm10 2h8v2h-8V6zm0 4h8v2h-8v-2zM4 6h6v6H4V6zm0 8h6v2H4v-2zm10 2h8v2h-8v-2z"></path>
+                </svg>
+              </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {bubbleOpen && selectedPatient && (
+        <div className="fixed bottom-10 right-10 bg-white shadow-lg rounded-lg p-4 w-64 flex flex-col items-start">
+          <button
+            onClick={() => setBubbleOpen(false)}
+            className="self-end bg-red-500 text-white rounded-full px-3 py-1 hover:bg-red-700">
+            X
+          </button>
+          <h2 className="text-lg font-bold mb-2">Datos del Paciente</h2>
+          <p><strong>Prescripcion:</strong> {selectedPatient.prescription_id}</p>
+          <p><strong>Nombre:</strong> {selectedPatient.nombre_completo}</p>
+          <p><strong>Fecha:</strong> {selectedPatient.fecha_de_nacimiento}</p>
+          <p><strong>Peso:</strong> {selectedPatient.padecimiento}</p>
+          <p><strong>Intolerante:</strong> {selectedPatient.i_lactosa}</p>
         </div>
       )}
 
