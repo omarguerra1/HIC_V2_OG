@@ -2,6 +2,24 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const handleCancelOrder = async (orderId) => {
+    const confirmCancel = window.confirm("¿Estás seguro de que quieres cancelar este pedido?");
+    if (!confirmCancel) return; 
+
+    try {
+        await axios.delete(`http://localhost:3000/order/${orderId}`);
+        alert("Pedido cancelado exitosamente");
+        window.location.reload();
+        setOrders(prevOrders => ({
+            ...prevOrders,
+            inProcess: prevOrders.inProcess.filter(o => o.order_id !== orderId)
+        }));
+    } catch (error) {
+        console.error("Error al cancelar pedido:", error);
+        //alert("Hubo un problema al cancelar el pedido");
+    }
+};
+
 const OrderTracking = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState({ inProcess: [], paid: [] });
@@ -66,19 +84,25 @@ const OrderTracking = () => {
         <h1 className="text-2xl font-bold mb-6">Pedidos en Proceso</h1>
         {orders.inProcess.length > 0 ? (
           orders.inProcess.map(order => (
-            <div key={order.order_id} className="mb-6 pb-6 border-b bg-gray-100 rounded-lg p-4">
-              <h2 className="text-xl font-semibold">
+            <div key={order.order_id} className="mb-6 pb-6 border-b bg-gray-100 rounded-lg p-4 flex flex-col items-center">
+              <h2 className="text-xl font-semibold text-center">
                 Pedido #{order.order_id} – {order.state}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 text-center">
                 Fecha de pedido: {new Date(order.order_date).toLocaleString()}
               </p>
-              <button
-                onClick={() => handlePayNow(order.order_id)}
-                className="mt-3 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition"
-              >
-                Pagar Ahora
-              </button>
+              <div className="flex gap-4 mt-3 justify-center">
+                <button
+                  onClick={() => handlePayNow(order.order_id)}
+                  className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition">
+                  Pagar Ahora
+                </button>
+                <button
+                  onClick={() => handleCancelOrder(order.order_id)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">
+                  Cancelar Pedido
+                </button>
+              </div>
             </div>
           ))
         ) : (
