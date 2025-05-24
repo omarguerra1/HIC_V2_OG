@@ -11,10 +11,11 @@ const Recetas = () => {
 
   // Arrays paralelos para captura
   const [medNames, setMedNames] = useState([]);
+  const [medFlavors, setMedFlavors] = useState([]);
   const [medDosages, setMedDosages] = useState([]);
   const [medFreqs, setMedFreqs] = useState([]);
+  const [medPrices, setMedPrices] = useState([]);
 
-  // Helper que recibe un objeto con `flavor` (string o array) y devuelve array
   const normalizeFlavors = p => {
     let arr = [];
     if (Array.isArray(p.flavor)) arr = p.flavor;
@@ -37,9 +38,7 @@ const Recetas = () => {
       );
       const presWithNames = await Promise.all(
         data.prescriptions.map(async p => {
-          // parseamos sabores
           const flavors = normalizeFlavors(p);
-          // traemos nombre de paciente
           const user = await axios.get(
             `http://localhost:3000/user/get_user/${p.user_id}`
           );
@@ -60,11 +59,12 @@ const Recetas = () => {
 
   const openModalWithPrescription = pres => {
     const flavors = normalizeFlavors(pres);
-    setFoundPrescription({ ...pres, flavors });
-    // inicializamos paralelos
+    setFoundPrescription(pres);
     setMedNames(Array(flavors.length).fill(""));
+    setMedFlavors(flavors);
     setMedDosages(Array(flavors.length).fill(""));
     setMedFreqs(Array(flavors.length).fill(""));
+    setMedPrices(Array(flavors.length).fill(0));
     setPreMsg(true);
   };
 
@@ -86,42 +86,41 @@ const Recetas = () => {
   };
 
   // Handlers de inputs
-  const handleNameChange = (i, v) => {
-    setMedNames(c => { c[i] = v; return [...c]; });
-  };
-  const handleDosageChange = (i, v) => {
-    setMedDosages(c => { c[i] = v; return [...c]; });
-  };
-  const handleFreqChange = (i, v) => {
-    setMedFreqs(c => { c[i] = v; return [...c]; });
-  };
+  const handleNameChange = (i, v) => setMedNames(c => { c[i] = v; return [...c]; });
+  const handleFlavorChange = (i, v) => setMedFlavors(c => { c[i] = v; return [...c]; });
+  const handleDosageChange = (i, v) => setMedDosages(c => { c[i] = v; return [...c]; });
+  const handleFreqChange = (i, v) => setMedFreqs(c => { c[i] = v; return [...c]; });
+  const handlePriceChange = (i, v) => setMedPrices(c => { c[i] = parseFloat(v) || 0; return [...c]; });
 
-  // Guarda y crea orden
+  // bloquea scroll de fondo cuando el modal está abierto
+  
   const handleSaveAndOrder = async () => {
     if (!foundPrescription) return;
-    const n = foundPrescription.flavors.length;
-    // validación
+    const n = medNames.length;
     for (let i = 0; i < n; i++) {
-      if (!medNames[i] || !medDosages[i] || !medFreqs[i]) {
+      if (!medNames[i] || !medFlavors[i] || !medDosages[i] || !medFreqs[i] || medPrices[i] <= 0) {
         alert("Complete todos los campos de cada medicamento");
         return;
       }
     }
     try {
-      // 1) meds
+      // Guardar cada medicamento con su precio
       for (let i = 0; i < n; i++) {
         await axios.post("http://localhost:3000/medicines/new_med", {
           prescription_id: foundPrescription.prescription_id,
-          flavor: foundPrescription.flavors[i],
+          flavor: medFlavors[i],
           nombre: medNames[i],
           dosis: medDosages[i],
           frecuencia: medFreqs[i],
+          precio: medPrices[i]
         });
       }
-      // 2) orden
+      // Crear la orden con total
+      const total = medPrices.reduce((sum, p) => sum + p, 0);
       const { data } = await axios.post("http://localhost:3000/order/order", {
         user_id: foundPrescription.user_id,
         prescription_id: foundPrescription.prescription_id,
+        total
       });
       if (data.success) {
         alert("¡Orden creada exitosamente!");
@@ -131,13 +130,9 @@ const Recetas = () => {
       alert("Error al guardar medicamentos o crear la orden");
     }
   };
-  // bloquea scroll de body cuando el modal está abierto
-  useEffect(() => {
-    document.body.style.overflow = preMsgOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [preMsgOpen])
+
   return (
-    <div className={`flex flex-col items-center p-6 ${preMsgOpen ? 'overflow-hidden h-screen' : ''}`}>
+    <div className={`flex flex-col items-center p-6 ${preMsgOpen ? 'h-screen' : ''}`}>
       <h2 className="text-3xl font-bold mb-6">Recetas en el Sistema</h2>
 
       <form onSubmit={handleSearch} className="mb-4">
@@ -176,8 +171,8 @@ const Recetas = () => {
       </ul>
 
       {preMsgOpen && foundPrescription && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-40 overflow-auto">
-          <div className="bg-white rounded-md shadow-lg w-1/2 mx-auto mt-48 max-h-[90vh] p-6 relative overflow-y-auto">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-start justify-center overflow-auto z-40">
+          <div className="bg-white rounded-md shadow-lg w-1/2 mt-24 max-h-[80vh] p-6 relative overflow-y-auto">
             <button
               onClick={() => setPreMsg(false)}
               className="absolute top-3 right-3 bg-red-500 text-white rounded-full px-3 py-1 hover:bg-red-700"
@@ -192,36 +187,52 @@ const Recetas = () => {
               className="w-full h-64 object-contain mb-4"
             />
 
-            {foundPrescription.flavors.map((sabor, i) => (
-              <div key={i} className="mb-4 border-b pb-4">
-                <p className="mb-2">
-                  <strong>Sabor {i + 1}:</strong> {sabor}
-                </p>
+            {medNames.map((_, i) => (
+              <div key={i} className="mb-6 border-b pb-4">
                 <input
                   type="text"
-                  placeholder={`Nombre medicamento ${i + 1}`}
+                  placeholder={`Nombre del medicamento ${i + 1}`}
                   value={medNames[i]}
                   onChange={e => handleNameChange(i, e.target.value)}
-                  className="w-full p-2 border rounded-md mb-2"
+                  className="w-full p-2 border placeholder:text-gray-600 rounded-md mb-2 bg-gray-100"
+                />
+                <input
+                  type="text"
+                  placeholder={`Sabor del medicamento ${i + 1}`}
+                  value={medFlavors[i]}
+                  onChange={e => handleFlavorChange(i, e.target.value)}
+                  className="w-full p-2 border placeholder:text-gray-600 rounded-md mb-2 bg-gray-100"
                 />
                 <input
                   type="text"
                   placeholder="Dosis"
                   value={medDosages[i]}
                   onChange={e => handleDosageChange(i, e.target.value)}
-                  className="w-full p-2 border rounded-md mb-2"
+                  className="w-full p-2 border placeholder:text-gray-600 rounded-md mb-2 bg-gray-100"
                 />
                 <input
                   type="text"
                   placeholder="Frecuencia"
                   value={medFreqs[i]}
                   onChange={e => handleFreqChange(i, e.target.value)}
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border placeholder:text-gray-600 rounded-md mb-2 bg-gray-100"
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Precio del medicamento"
+                  value={medPrices[i]}
+                  onChange={e => handlePriceChange(i, e.target.value)}
+                  className="w-full p-2 border placeholder:text-gray-600 rounded-md bg-gray-100"
                 />
               </div>
             ))}
 
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="text-right font-semibold text-lg mb-4">
+              Total: ${medPrices.reduce((sum, p) => sum + p, 0).toFixed(2)} MXN
+            </div>
+
+            <div className="flex justify-end space-x-3">
               <button
                 onClick={handleSaveAndOrder}
                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700"

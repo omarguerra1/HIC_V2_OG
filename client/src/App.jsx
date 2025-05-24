@@ -223,24 +223,24 @@ const App = () => {
 
             <div className="text-center md:text-left">
               <h3 className="font-bold text-black mb-2">Contacto</h3>
-              <p className="font-semibold text-fuchsia-900">-------------</p>
-              <p className="font-semibold text-fuchsia-900">-------------</p>
-              <p className="font-semibold text-fuchsia-900">-------------</p>
+              <p className="font-semibold text-fuchsia-900">973 7756</p>
+              <p className="font-semibold text-fuchsia-900">973 7757</p>
+              <p className="font-semibold text-fuchsia-900">ext. 404 y 417</p>
             </div>
 
-            <div className="text-center md:text-left">
+            <div className="text-left">
               <h3 className="font-bold text-black mb-2">Redes Sociales</h3>
               <div className="flex justify-start space-x-3 mt-3">
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.instagram.com/hicoficial/" target="_blank" rel="noopener noreferrer">
                   <img src={insta} alt="Instagram" className="h-6 w-6" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.facebook.com/hicoficial/" target="_blank" rel="noopener noreferrer">
                   <img src={fa} alt="Facebook" className="h-6 w-6" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                <a href="https://x.com/hicoficial" target="_blank" rel="noopener noreferrer">
                   <img src={twitter} alt="Twitter" className="h-6 w-6" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.youtube.com/user/HICoficial/" target="_blank" rel="noopener noreferrer">
                   <img src={youtube} alt="Website" className="h-6 w-6" />
                 </a>
               </div>
@@ -249,7 +249,7 @@ const App = () => {
           </div>
 
           <div className="text-center mt-8">
-            <p>&copy; 2025 Todos los derechos reservados.</p>
+             <p>&copy; 2025 Hospital Infantil de las Californias. Todos los derechos reservados.</p>
           </div>
         </footer>
 

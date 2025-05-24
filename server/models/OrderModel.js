@@ -22,7 +22,7 @@ const OrderModel = db.define('order', {
     },
     estado_pago: {
         type: DataTypes.ENUM('Pagada', 'Sin Pagar'),
-        defaultValue: 'Sin Pagar',      // aquí
+        defaultValue: 'Sin Pagar',      
   },
     user_id: {
         type: DataTypes.INTEGER,
