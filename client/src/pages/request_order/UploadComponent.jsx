@@ -35,7 +35,7 @@ const UploadComponent = () => {
 
   // Inicializa usuario y array de sabores cuando cambia medCount
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    const user = JSON.parse(sessionStorage.getItem("usuarioActual"));
     setCurrentUser(user);
     setFlavors(Array(medCount).fill(""));
   }, [medCount]);

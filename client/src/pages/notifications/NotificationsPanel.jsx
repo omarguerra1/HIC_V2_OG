@@ -1,38 +1,83 @@
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+// traemos el ícono de usuario de lucide-react
+import { User } from 'lucide-react';
 
-const NotificationsPanel = ({ onClose }) => (
-  <div className="w-[400px] absolute z-50 right-0 h-auto max-h-[80vh] overflow-x-hidden overflow-y-auto transform transition ease-in-out duration-700 bg-gray-50 rounded-lg shadow-lg p-6">
-    <div className="flex items-center justify-between">
-      <p className="text-2xl font-semibold text-gray-800">Notificaciones</p>
-      <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-        <svg width={24} height={24} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M18 6L6 18M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-    </div>
+const NotificationsPanel = ({ userId, onClose, refreshKey }) => {
+  const [notifications, setNotifications] = useState([]);
 
-    {/* Notificaciones individuales */}
-    <div className="w-full p-3 mt-6 bg-white rounded flex shadow">
-      <div className="w-8 h-8 border rounded-full border-gray-200 flex items-center justify-center">
-        {/* Icono dentro */}
-        <svg width={16} height={16} fill="#EF4444" viewBox="0 0 16 16">
-          <path d="M8.00059 3.01934C9.56659 1.61334 11.9866 1.66 13.4953 3.17134C15.0033 4.68334 15.0553 7.09133 13.6526 8.662L7.99926 14.3233L2.34726 8.662C0.944589 7.09133 0.997256 4.67934 2.50459 3.17134C4.01459 1.662 6.42992 1.61134 8.00059 3.01934Z" />
-        </svg>
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://localhost:3000/notifications/${userId}`
+        );
+        setNotifications(data);
+      } catch (err) {
+        console.error('Error al cargar notificaciones:', err);
+      }
+    };
+    fetchNotifications();
+  }, [userId, refreshKey]);
+
+  const markAsRead = async (id) => {
+    try {
+      await axios.put(
+        `http://localhost:3000/notifications/read/${id}`
+      );
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.notification_id === id ? { ...n, is_read: true } : n
+        )
+      );
+    } catch (err) {
+      console.error('Error al marcar como leída:', err);
+    }
+  };
+
+  return (
+    <div className="w-[400px] absolute z-50 right-0 h-auto max-h-[80vh] overflow-x-hidden overflow-y-auto transform transition ease-in-out duration-700 bg-gray-50 rounded-lg shadow-lg p-6">
+      <div className="flex items-center justify-between">
+        <p className="text-2xl font-semibold text-gray-800">Notificaciones</p>
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <svg width={24} height={24} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
-      <div className="pl-3">
-        <p className="text-sm text-black">
-          <span className="text-indigo-700">James Doe</span> marcó como favorito un <span className="text-indigo-700">elemento</span>
-        </p>
-        <p className="text-xs text-gray-500">hace 2 horas</p>
+
+      <div className="flex flex-col gap-4 mt-6">
+        {notifications.length === 0
+          ? <p className="text-gray-500">No tienes notificaciones.</p>
+          : notifications.map(note => (
+            <div
+              key={note.notification_id}
+              onClick={() => markAsRead(note.notification_id)}
+              className={`w-full p-3 bg-white rounded flex shadow cursor-pointer ${note.is_read ? 'opacity-50' : ''}`}
+            >
+              <div className="w-8 h-8 border rounded-full border-gray-200 flex items-center justify-center">
+                {/* Aquí va el ícono de usuario */}
+                <User size={16} className="text-gray-500" />
+              </div>
+              <div className="pl-3">
+                <p className="text-sm text-black">{note.message}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(note.createdAt).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          ))
+        }
       </div>
     </div>
-
-    {/* Repite más bloques similares para otras notificaciones */}
-  </div>
-);
-
-NotificationsPanel.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  );
 };
 
-export default NotificationsPanel
+NotificationsPanel.propTypes = {
+  userId:     PropTypes.number.isRequired,
+  onClose:    PropTypes.func.isRequired,
+  refreshKey: PropTypes.number.isRequired,
+};
+
+export default NotificationsPanel;

@@ -7,7 +7,7 @@ const UserProfile = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    const user = JSON.parse(sessionStorage.getItem("usuarioActual"));
     if (user) setCurrentUser(user);
   }, []);
 
@@ -18,7 +18,7 @@ const UserProfile = () => {
   const handleSaveChanges = async () => {
     try {
       const response = await axios.put(`http://localhost:3000/user/update/${currentUser.user_id}`, currentUser);
-      localStorage.setItem("usuarioActual", JSON.stringify(response.data.user));
+      sessionStorage.setItem("usuarioActual", JSON.stringify(response.data.user));
       alert("Datos de usuario actualizados.");
     } catch (error) {
       console.error("Error al actualizar datos:", error);

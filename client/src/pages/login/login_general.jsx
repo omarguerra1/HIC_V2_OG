@@ -38,7 +38,7 @@ const LoginGeneral = () => {
             });
             if (response.status === 200) {
                 const currentUser = response.data.user;
-                localStorage.setItem("usuarioActual", JSON.stringify(currentUser));
+                sessionStorage.setItem("usuarioActual", JSON.stringify(currentUser));
                 alert("Login exitoso");
             }
         } catch (error) {
@@ -46,7 +46,6 @@ const LoginGeneral = () => {
             console.error(error);
         }
         navigate("/", { replace: true });
-        window.location.reload("/");
     };
 
     const handleTypeOfUser = () => {

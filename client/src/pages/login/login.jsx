@@ -35,7 +35,7 @@ const Login = () => {
 
             if (response.status === 200) {
                 const currentUser = response.data.user;
-                localStorage.setItem("usuarioActual", JSON.stringify(currentUser));
+                sessionStorage.setItem("usuarioActual", JSON.stringify(currentUser));
                 alert("Login exitoso");
                 navigate("/", { replace: true });
                 window.location.reload();

@@ -8,7 +8,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    const user = JSON.parse(sessionStorage.getItem("usuarioActual"));
     setCurrentUser(user);
   }, []);
   const handleOrderClick = (e) => {

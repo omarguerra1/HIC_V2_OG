@@ -9,9 +9,6 @@ const Recetas = () => {
   const [preMsgOpen, setPreMsg] = useState(false);
   const [foundPrescription, setFoundPrescription] = useState(null);
 
-  // Estados para visualizar formulario de otra rama
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState([]);
 
   // Estados para "bubble" de datos del paciente
   const [bubbleOpen, setBubbleOpen] = useState(false);
@@ -136,21 +133,6 @@ const Recetas = () => {
     }
   };
 
-  // Función de la otra rama para alternar y cargar formData
-  const handleShowForm = async () => {
-    const next = !showForm;
-    setShowForm(next);
-    if (next) {
-      try {
-        const response = await axios.get("http://localhost:3000/prescriptions/get_prescriptions");
-        setFormData(Array.isArray(response.data.prescriptions)
-          ? response.data.prescriptions
-          : []);
-      } catch (error) {
-        console.error("Error al obtener respuestas:", error);
-      }
-    }
-  };
 
   // Bloquear scroll del body cuando esté el modal de edición abierto
   useEffect(() => {
@@ -161,24 +143,6 @@ const Recetas = () => {
   return (
     <div className={`flex flex-col items-center p-6 ${preMsgOpen ? 'h-screen' : ''}`}>
       <h2 className="text-3xl font-bold mb-4">Recetas en el Sistema</h2>
-
-      {/* Botón para mostrar/ocultar el formulario extra */}
-      <button
-        onClick={handleShowForm}
-        className="mb-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-      >
-        {showForm ? 'Ocultar Datos de Formulario' : 'Ver Datos de Formulario'}
-      </button>
-
-      {/* Renderizado básico de formData */}
-      {showForm && (
-        <div className="w-full max-w-2xl mb-6 p-4 bg-yellow-50 rounded shadow">
-          <h3 className="font-semibold mb-2">Respuestas del Formulario:</h3>
-          <pre className="text-sm text-gray-700 overflow-auto max-h-40">
-            {JSON.stringify(formData, null, 2)}
-          </pre>
-        </div>
-      )}
 
       <form onSubmit={handleSearch} className="mb-4 flex">
         <input

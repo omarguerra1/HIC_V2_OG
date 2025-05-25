@@ -11,8 +11,9 @@ import medicineRoutes from "./routes/medicamentoRoutes.js";
 import HistorialPagosRoutes from "./routes/HistorialPagosRoutes.js";
 import pdfRoutes from "./routes/pdfRoutes.js";
 import ordermedicamentosRoutes from "./routes/ordermedicamentosRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js"
 import './database/associations.js';
-import {Server} from "socket.io";
+import { Server } from "socket.io";
 import http from "http";
 import axios from "axios";
 //import UserModel  from './models/UserModel.js'
@@ -21,10 +22,8 @@ import axios from "axios";
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-    }
+export const io = new Server(server, {
+    cors: { origin: "http://localhost:5173",methods: ["GET", "POST"] }
 });
 
 app.use(cors({
@@ -42,42 +41,40 @@ app.use("/medicines", medicineRoutes);
 app.use("/historial_pagos", HistorialPagosRoutes);
 app.use('/pdf', pdfRoutes); // Registrar la ruta
 app.use("/order_medicamentos", ordermedicamentosRoutes);
-
-
-
+app.use("/notifications", notificationRoutes);
 
 try {
     await db.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
 
-    await db.sync({force: false});
+    await db.sync({ force: false });
     console.log("Base de datos sincronizada con los modelos");
-    
+
 } catch (error) {
     console.error('No se pudo conectar a la base de datos:', error);
 }
 
 io.on("connection", (socket) => {
     console.log("Usuario conectado a socket.io");
-    socket.on("userLoggedIn", async ( userID, userRole ) => {
+    socket.on("userLoggedIn", async (userID, userRole) => {
         console.log(`userLoggedIn event recibido. userID: ${userID}, userRole: ${userRole}`);
         try {
             let filteredMessages = [];
             const response = await axios.get("http://localhost:3000/message/");
-            if(userRole === "general"){
-                filteredMessages = response.data.messages.filter( (msg) => msg.receiver_id === userID );
-            } else if(userRole === "hic_admin"){
-                filteredMessages = response.data.messages.filter( (msg) => msg.receiver_id === null );
+            if (userRole === "general") {
+                filteredMessages = response.data.messages.filter((msg) => msg.receiver_id === userID);
+            } else if (userRole === "hic_admin") {
+                filteredMessages = response.data.messages.filter((msg) => msg.receiver_id === null);
             }
             const unseenMsgs = filteredMessages.filter(msg => msg.hasBeenSeen === "false");
             const unseenCount = unseenMsgs.length;
             console.log(`unseen msgs: ${unseenCount}`);
             socket.emit("msgCount", unseenCount);
 
-            if(unseenCount > 0){
+            if (unseenCount > 0) {
                 socket.emit("unseenMessages", `Tienes ${unseenCount} mensajes nuevos`);
             }
-        }catch(error){
+        } catch (error) {
             console.error("Error al obtener los mensajes");
         }
     });

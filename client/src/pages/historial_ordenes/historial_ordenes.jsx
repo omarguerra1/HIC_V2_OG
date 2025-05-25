@@ -14,7 +14,7 @@ const HistorialOrdenes = () => {
   const perPage = 10;
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActual"));
+    const user = JSON.parse(sessionStorage.getItem("usuarioActual"));
     setCurrentUser(user);
   }, []);
 

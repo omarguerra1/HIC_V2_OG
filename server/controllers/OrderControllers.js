@@ -1,7 +1,9 @@
+import { io } from "../main.js";
 import OrderModel from "../models/OrderModel.js";
 import UserModel from "../models/UserModel.js";
 import MedicamentoModel from "../models/MedicamentoModel.js";
 import PrescriptionModel from "../models/PrescriptionModel.js";
+import NotificationModel from "../models/NotificationModel.js";
 
 export const getAllOrders = async (req, res) => {
   try {
@@ -35,6 +37,7 @@ export const getAllOrders = async (req, res) => {
       const total = meds.reduce((sum, m) => sum + parseFloat(m.precio || 0), 0);
       return {
         order_id: o.order_id,
+        user_id: o.user_id,              // ← lo añadimos
         state: o.state,
         estado_pago: o.estado_pago,
         order_date: o.order_date,
@@ -68,7 +71,7 @@ export const getOneOrder = async (req, res) => {
             'medicamento_id',
             'nombre',
             'flavor',
-            'precio'        
+            'precio'
           ]
         }
       ]
@@ -113,7 +116,23 @@ export const createOrder = async (req, res) => {
       user_id,
       prescription_id,
     });
-
+    const admins = await UserModel.findAll({ where: { role: 'hic_admin' } });
+    const msg = `El pedido ${newOrder.order_id} ha sido pagado por el usuario ${newOrder.user_id}.`;
+    const created =await Promise.all(
+      admins.map(a =>
+        NotificationModel.create({ user_id: a.user_id, message: msg })
+      )
+    );
+    console.log("🔔 Notificaciones creadas:", created.map(n => ({
+      id: n.notification_id,
+      user: n.user_id,
+      msg: n.message
+    })));
+    io.emit("order-created", {
+      orderId: newOrder.order_id,
+      byUser: user_id,
+      timestamp: new Date(),
+    });
     res.status(201).json({
       message: "Pedido creado",
       success: true,
@@ -143,6 +162,22 @@ export const updateOrder = async (req, res) => {
     if (updated) {
       const updatedOrder = await OrderModel.findOne({
         where: { order_id },
+      });
+      const order = await OrderModel.findByPk(order_id);
+      //Notificamos al usuario dueño de la orden:
+      const created =await NotificationModel.create({
+        user_id: order.user_id,
+        message: `Tu orden ${order_id} cambió a "${order.state}".`
+      });
+      console.log("🔔 Notificaciones creadas:", created.map(n => ({
+        id: n.notification_id,
+        user: n.user_id,
+        msg: n.message
+      })));
+      io.emit("order-updated", {
+        orderId: order_id,
+        newState: order.state,
+        timestamp: new Date(),
       });
       res.status(200).json({
         message: "Pedido actualizado",
