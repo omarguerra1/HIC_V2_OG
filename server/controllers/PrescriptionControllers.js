@@ -1,7 +1,9 @@
-import multer from 'multer';
-
+import { io } from "../main.js";
 import PrescriptionModel from "../models/PrescriptionModel.js";
+import UserModel from '../models/UserModel.js';
+import NotificationModel from '../models/NotificationModel.js';
 //multer para almacenar las imagenes en src/uploads
+import multer from "multer";
 // Configuración de multer para manejar la subida de imágenes
 // Multer para subir la imagen
 const storage = multer.diskStorage({
@@ -58,23 +60,23 @@ export const createPrescription = async (req, res) => {
     }
     // 2) Extraer y normalizar sabores
     // Extraer y normalizar sabores
-let flavors;
-if (req.body.flavors) {
-    flavors = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
-} else if (req.body.flavor) {
-    try {
-        const parsed = JSON.parse(req.body.flavor);
-        if (!Array.isArray(parsed)) throw new Error();
-        flavors = parsed;
-    } catch {
-        return res.status(400).json({ message: "El campo 'flavor' debe ser un JSON array válido." });
+    let flavors;
+    if (req.body.flavors) {
+        flavors = Array.isArray(req.body.flavors) ? req.body.flavors : [req.body.flavors];
+    } else if (req.body.flavor) {
+        try {
+            const parsed = JSON.parse(req.body.flavor);
+            if (!Array.isArray(parsed)) throw new Error();
+            flavors = parsed;
+        } catch {
+            return res.status(400).json({ message: "El campo 'flavor' debe ser un JSON array válido." });
+        }
+    } else {
+        return res.status(400).json({ message: "No se recibió ningún sabor ('flavors' o 'flavor')." });
     }
-} else {
-    return res.status(400).json({ message: "No se recibió ningún sabor ('flavors' o 'flavor')." });
-}
 
-// **Ahora flavors está correctamente definido antes de usarlo**
-console.log("Flavors recibidos:", flavors);
+    // **Ahora flavors está correctamente definido antes de usarlo**
+    console.log("Flavors recibidos:", flavors);
 
     // 3) Desestructurar resto del body
     const {
@@ -111,7 +113,24 @@ console.log("Flavors recibidos:", flavors);
             padecimiento,
             i_lactosa
         });
-
+        //notificar a los admin de los cambios
+        const admins = await UserModel.findAll({ where: { role: "hic_admin" } });
+        const msg = `Nueva receta (${newPrescription.prescription_id}) de ${newPrescription.nombre_completo} pendiente de aprobación.`;
+        const created = await Promise.all(
+            admins.map(a =>
+                NotificationModel.create({ user_id: a.user_id, message: msg })
+            )
+        );
+        console.log("🔔 Notificaciones creadas:", created.map(n => ({
+            id: n.notification_id,
+            user: n.user_id,
+            msg: n.message
+        })));
+        io.emit("new-prescription", {
+            prescriptionId: newPrescription.prescription_id,
+            quien: newPrescription.nombre_completo,
+            timestamp: new Date(),
+        });
         return res.status(201).json({
             message: "Receta creada correctamente.",
             prescription: newPrescription
@@ -124,14 +143,32 @@ console.log("Flavors recibidos:", flavors);
 };
 // Actualizar una receta existente
 export const updatePrescription = async (req, res) => {
+    const { id } = req.params;
     try {
         const [updated] = await PrescriptionModel.update(req.body, {
-            where: { prescription_id: req.params.id },
+            where: { prescription_id: id },
         });
 
         if (updated) {
             const updatedPrescription = await PrescriptionModel.findOne({
                 where: { prescription_id: req.params.id },
+            });
+            const pres = await PrescriptionModel.findByPk(id);
+
+            // Notificamos al usuario dueño de la receta:
+            const created = await NotificationModel.create({
+                user_id: pres.user_id,
+                message: `Tu receta ${pres.prescription_id} ha sido aprobada y está lista para pago.`
+            });
+            console.log("🔔 Notificaciones creadas:", created.map(n => ({
+                id: n.notification_id,
+                user: n.user_id,
+                msg: n.message
+            })));
+            io.emit("prescription-updated", {
+                prescriptionId: pres.prescription_id,
+                userId: pres.user_id,
+                timestamp: new Date()
             });
             res.status(200).json({
                 message: "Receta actualizada",

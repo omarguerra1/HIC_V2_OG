@@ -7,7 +7,8 @@ import insta from './images/instagram.png'
 import fa from './images/facebook.png'
 import twitter from './images/gorjeo.png'
 import youtube from './images/youtube.png'
-import io from "socket.io-client";
+import socket from './socketClient.js' //modulo singleton
+import axios from 'axios';
 //Shared pages
 import UserProfile from "./pages/user_profile/user_profile.jsx"
 import HomePage from './pages/home/HomePage.jsx';
@@ -26,7 +27,6 @@ import VerUsuarios from "./pages/admin_pages/VerUsuarios.jsx"
 import VerOrdenes from "./pages/admin_pages/VerOrdenes.jsx"
 import Recetas from "./pages/recetas/recetas.jsx"
 import CardPaymentForm from "./pages/payment/pagos.jsx";
-const socket = io("http://localhost:3000");
 
 
 const App = () => {
@@ -34,21 +34,76 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0); //counter de notificaciones
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("usuarioActual"));
-    setCurrentUser(user);
-  }, []);
-
-  useEffect(() => {
-    if (currentUser) {
-      socket.emit("userLoggedIn", currentUser.user_id, currentUser.role);
-      socket.on("unseenMessages", (message) => {
-        alert(message);
-      });
-      return () => {
-        socket.off("unseenMessages");
-      };
+    const raw = sessionStorage.getItem("usuarioActual");
+    if (raw) {
+      try {
+        const u = JSON.parse(raw);
+        if (u.user_id) {
+          setCurrentUser(u);
+        }
+      } catch {
+        // JSON inválido: borramos para evitar bucles
+        sessionStorage.removeItem("usuarioActual");
+      }
     }
+  }, []);
+  // en cada cambio de user o refreshKey recargamos count
+  useEffect(() => {
+    if (!currentUser) return;
+    (async () => {
+      try {
+        const { data } = await axios.get(`http://localhost:3000/notifications/${currentUser.user_id}`);
+        setUnreadCount(data.filter(n => !n.is_read).length);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [currentUser, refreshKey]);
+  useEffect(() => {
+    if (!currentUser) return;
+    socket.connect();
+    // Mensajes
+    socket.emit("userLoggedIn", currentUser.user_id, currentUser.role);
+    socket.on("unseenMessages", (message) => {
+      alert(message);
+    });
+    //add events notifications
+    // Admin: nueva receta subida
+    socket.on("new-prescription", () => {
+      if (currentUser.role === "admin") {
+        setRefreshKey(k => k + 1);
+      }
+    });
+    // Admin: orden pagada
+    socket.on("order-created", () => {
+      if (currentUser.role === "admin") {
+        setRefreshKey(k => k + 1);
+      }
+    });
+    // General: receta aprobada (solo la suya)
+    socket.on("prescription-updated", (data) => {
+      if (currentUser.role === "general" && data.userId === currentUser.user_id) {
+        setRefreshKey(k => k + 1);
+      }
+    });
+    // General: estado de pedido cambiado (solo el suyo)
+    socket.on("order-updated", (data) => {
+      if (currentUser.role === "general" && data.userId === currentUser.user_id) {
+        setRefreshKey(k => k + 1);
+      }
+    });
+    return () => {
+      //limpiar los handlers
+      socket.off("unseenMessages");
+      socket.off("new-prescription");
+      socket.off("order-created");
+      socket.off("prescription-updated");
+      socket.off("order-updated");
+      socket.disconnect();
+    };
   }, [currentUser]);
 
   const handleUserButton = () => {
@@ -64,16 +119,11 @@ const App = () => {
     if (option === "profile") {
       window.location.href = "/user-profile";
     } else if (option === "logout") {
-      localStorage.removeItem("usuarioActual");
+      sessionStorage.removeItem("usuarioActual");
       setCurrentUser(null);
       window.location.href = "/";
     }
   };
-
-  const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
-  };
-
   return (
     <Router>
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
@@ -86,7 +136,7 @@ const App = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowNotifications(v => !v)}
-              className="bg-black p-2 rounded-full hover:bg-gray-800 transition"
+              className="relative bg-black p-2 rounded-full hover:bg-gray-800 transition"
             >
               <svg
                 className="w-6 h-6 text-white"
@@ -106,22 +156,33 @@ const App = () => {
              01-6 0v-1m6 0H9"
                 />
               </svg>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             <button
               onClick={handleUserButton}
               className="bg-fuchsia-500 text-white rounded-2xl px-4 py-1 hover:bg-fuchsia-600 transition"
             >
-              {currentUser ? `Hola ${currentUser.name_}` : 'Iniciar Sesión'}
+              {currentUser
+                ? `Hola ${currentUser.name_ ?? "usuario"}`
+                : "Iniciar Sesión"
+              }
             </button>
           </div>
 
-          {showNotifications && (
+          {showNotifications && currentUser?.user_id && (
             <div className="absolute top-28 right-0 z-50">
-              <NotificationsPanel onClose={() => setShowNotifications(false)} />
+              <NotificationsPanel
+                userId={currentUser.user_id}
+                onClose={() => setShowNotifications(false)}
+                refreshKey={refreshKey}
+              />
             </div>
           )}
-
           {isMenuOpen && currentUser && (
             <div className="absolute top-16 right-0 mt-1 w-48 bg-fuchsia-500 hover:bg-fuchsia-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 z-50">
               <div className="flex items-center px-4 py-3 border-b border-black">
@@ -180,7 +241,6 @@ const App = () => {
             </div>
           )}
         </header>
-
         {/* Ajustar el espacio para el contenido para que el header no se sobreponga */}
         <main className="flex-grow container w-screen p-4 flex items-center justify-center">
           <Routes>
@@ -200,7 +260,6 @@ const App = () => {
             <Route path="/pagar/:orderId" element={<CardPaymentForm />} />
           </Routes>
         </main>
-
         {/* Footer */}
         <footer className="bg-gray-200 text-center px-4 w-screen">
           <div className="flex flex-col items-center md:flex-row md:justify-around md:items-start mt-8 space-y-6 md:space-y-0">
@@ -249,7 +308,7 @@ const App = () => {
           </div>
 
           <div className="text-center mt-8">
-             <p>&copy; 2025 Hospital Infantil de las Californias. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Hospital Infantil de las Californias. Todos los derechos reservados.</p>
           </div>
         </footer>
 

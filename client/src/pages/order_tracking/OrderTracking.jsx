@@ -11,7 +11,7 @@ const OrderTracking = () => {
     const fetchUserOrders = async () => {
       try {
         // 1) Obtener user_id (ajusta según tu login)
-        const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
+        const usuario = JSON.parse(sessionStorage.getItem('usuarioActual'));
         if (!usuario) throw new Error('Usuario no autenticado');
         const user_id = usuario.user_id;
 
