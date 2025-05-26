@@ -82,7 +82,7 @@ const Messages = () => {
             const response = await axios.get(`http://localhost:3000/user/get_user/${userId}`);
             return response.data;
         } catch (error) {
-            console.error("Error al obtener nombre de usuario");
+            console.error("Error al obtener nombre de usuario",error);
             return null;
         }
     };

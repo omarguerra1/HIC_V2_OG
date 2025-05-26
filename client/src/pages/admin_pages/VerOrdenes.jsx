@@ -29,7 +29,7 @@ const VerOrdenes = () => {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       alert("No se pudo obtener la informacion de las ordenes");
-      console.log("Error al obtener ordenes");
+      console.log("Error al obtener ordenes",error);
     }
   };
 
@@ -38,7 +38,8 @@ const VerOrdenes = () => {
       const response = await axios.get(`http://localhost:3000/user/get_user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error("Error al obtener nombre de usuario");
+      alert("No se pudo obtener el nombre de usuario");
+      console.error("Error al obtener nombre de usuario: ", error);
       return null;
     }
   };
@@ -89,6 +90,7 @@ const VerOrdenes = () => {
       }
     } catch (error) {
       alert("Error al actualizar pedido");
+      console.log("Error : ",error);
     }
   };
 
