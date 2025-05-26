@@ -44,7 +44,7 @@ const Register = () => {
 
   return (
     <div className="login-form max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Registro de Usuario</h2>
+      <h2 className="text-2xl font-bold mb-4 justify-center w-96"> Registro de Usuario </h2>
       <form onSubmit={(e) => { e.preventDefault(); registerGeneralUser(); }}>
         <div className="mb-2">
           <label htmlFor="nombreUsuario" className="block text-sm font-medium text-gray-700">Nombre completo*</label>
