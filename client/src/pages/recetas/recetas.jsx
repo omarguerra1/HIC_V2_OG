@@ -109,7 +109,8 @@ const Recetas = () => {
     }
     try {
       for (let i = 0; i < n; i++) {
-        await axios.post("http://localhost:3000/medicines/new_med", {
+        console.log(`Precio de ${medNames[i]}:`, medPrices[i]);
+        await axios.post("http://localhost:3000/medicines/new_med", { //"http://localhost:3000/medicines/new_med"
           prescription_id: foundPrescription.prescription_id,
           flavor:     medFlavors[i],
           nombre:     medNames[i],

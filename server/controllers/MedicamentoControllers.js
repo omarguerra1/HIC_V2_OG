@@ -24,17 +24,13 @@ export const getMedicamento = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-// Crear un nuevo medicamento
 export const createMedicamento = async (req, res) => {
-    const { nombre, flavor, dosis, frecuencia, prescription_id } = req.body;
+    console.log("Datos recibidos en backend:", req.body);  // ✅ Imprime lo que llega desde el frontend
+    const { nombre, flavor, dosis, frecuencia, prescription_id, precio } = req.body;
 
     try {
         const newMedicamento = await MedicamentoModel.create({
-            nombre: nombre,
-            flavor: flavor,
-            dosis: dosis,
-            frecuencia: frecuencia,
-            prescription_id: prescription_id,
+            nombre, flavor, dosis, frecuencia, prescription_id, precio
         });
 
         res.status(201).json({

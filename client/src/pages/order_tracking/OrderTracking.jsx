@@ -70,7 +70,7 @@ const OrderTracking = () => {
   return (
     <div className="flex flex-wrap justify-center p-4 max-w-6xl mx-auto gap-8">
       {/* Botón Regresar */}
-      <div className="w-full">
+      <div className="w-full text-left">
         <button
           onClick={() => window.history.back()}
           className="mb-4 px-4 py-2 bg-gray-300 text-black rounded flex items-center"
