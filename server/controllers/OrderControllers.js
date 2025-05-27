@@ -116,21 +116,27 @@ export const createOrder = async (req, res) => {
       user_id,
       prescription_id,
     });
+    // 2) Notificar al usuario que puede pagar
+    await NotificationModel.create({
+      user_id: newOrder.user_id,
+      message: `Tu pedido ${newOrder.order_id} ha sido aprobado y puedes proceder a pagarlo.`,
+    });
+    io.to(`user_${newOrder.user_id}`)
+      .emit("order-ready-to-pay", {
+        orderId: newOrder.order_id,
+        message: "Tu pedido ha sido aprobado y puedes proceder a pagarlo"
+      });
+    // 3) (Opcional) Notificar a los admins
     const admins = await UserModel.findAll({ where: { role: 'hic_admin' } });
-    const msg = `El pedido ${newOrder.order_id} ha sido pagado por el usuario ${newOrder.user_id}.`;
-    const created =await Promise.all(
+    const adminMsg = `Se creó nueva orden #${newOrder.order_id} de usuario ${newOrder.user_id}.`;
+    await Promise.all(
       admins.map(a =>
-        NotificationModel.create({ user_id: a.user_id, message: msg })
+        NotificationModel.create({ user_id: a.user_id, message: adminMsg })
       )
     );
-    console.log("🔔 Notificaciones creadas:", created.map(n => ({
-      id: n.notification_id,
-      user: n.user_id,
-      msg: n.message
-    })));
-    io.emit("order-created", {
+    io.to('admin').emit('new-order', {
       orderId: newOrder.order_id,
-      byUser: user_id,
+      byUser: newOrder.user_id,
       timestamp: new Date(),
     });
     res.status(201).json({
@@ -164,12 +170,39 @@ export const updateOrder = async (req, res) => {
         where: { order_id },
       });
       const order = await OrderModel.findByPk(order_id);
-      //Notificamos al usuario dueño de la orden:
-      const created =await NotificationModel.create({
+      if (req.body.estado_pago === "Pagada") {
+        const admins = await UserModel.findAll({ where: { role: "hic_admin" } });
+        await Promise.all(
+          admins.map(a =>
+            NotificationModel.create({
+              user_id: a.user_id,
+              message: `El usuario ${order.user_id} ha pagado la orden #${order_id}.`
+            })
+          )
+        );
+        io.to("admin").emit("order-paid", {
+          orderId: order_id,
+          byUser: order.user_id,
+          timestamp: new Date()
+        });
+      }
+      if (req.body.state) {
+        await NotificationModel.create({
+          user_id: order.user_id,
+          message: `Tu pedido #${order_id} cambió a "${order.state}".`
+        });
+        io.to(`user_${order.user_id}`).emit("order-state-changed", {
+          orderId: order_id,
+          newState: order.state,
+          timestamp: new Date()
+        });
+      }
+      /*//Notificamos al usuario dueño de la orden:
+      const created = await NotificationModel.create({
         user_id: order.user_id,
         message: `Tu orden ${order_id} cambió a "${order.state}".`
       });
-      console.log("🔔 Notificaciones creadas:", created.map(n => ({
+      console.log("Notificaciones creadas:", created.map(n => ({
         id: n.notification_id,
         user: n.user_id,
         msg: n.message
@@ -178,7 +211,8 @@ export const updateOrder = async (req, res) => {
         orderId: order_id,
         newState: order.state,
         timestamp: new Date(),
-      });
+      });*/
+      // 4) Si se actualizó el estado de preparación/entrega, notifica al user dueño
       res.status(200).json({
         message: "Pedido actualizado",
         order: updatedOrder,

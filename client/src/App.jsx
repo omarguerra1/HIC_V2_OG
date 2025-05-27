@@ -70,38 +70,42 @@ const App = () => {
     socket.on("unseenMessages", (message) => {
       alert(message);
     });
-    //add events notifications
-    // Admin: nueva receta subida
-    socket.on("new-prescription", () => {
-      if (currentUser.role === "admin") {
+    if (currentUser.role === "hic_admin") {
+      socket.on("new-prescription", () => {
         setRefreshKey(k => k + 1);
-      }
-    });
-    // Admin: orden pagada
-    socket.on("order-created", () => {
-      if (currentUser.role === "admin") {
+      });
+      socket.on("new-order", () => {
         setRefreshKey(k => k + 1);
-      }
-    });
-    // General: receta aprobada (solo la suya)
-    socket.on("prescription-updated", (data) => {
-      if (currentUser.role === "general" && data.userId === currentUser.user_id) {
+      });
+      socket.on("order-paid", () => {
         setRefreshKey(k => k + 1);
-      }
-    });
-    // General: estado de pedido cambiado (solo el suyo)
-    socket.on("order-updated", (data) => {
-      if (currentUser.role === "general" && data.userId === currentUser.user_id) {
+      });
+    }
+
+    // —— GENERAL —— escuchan estos eventos
+    if (currentUser.role === "general") {
+      socket.on("prescription-updated", ({userId }) => {
+        if (userId === currentUser.user_id) {
+          setRefreshKey(k => k + 1);
+        }
+      });
+      socket.on("order-ready-to-pay", () => {
         setRefreshKey(k => k + 1);
-      }
-    });
+      });
+      socket.on("order-state-changed", () => {
+        setRefreshKey(k => k + 1);
+      });
+    }
     return () => {
       //limpiar los handlers
+      // Limpiar todos los handlers
       socket.off("unseenMessages");
       socket.off("new-prescription");
-      socket.off("order-created");
+      socket.off("new-order");
+      socket.off("order-paid");
       socket.off("prescription-updated");
-      socket.off("order-updated");
+      socket.off("order-ready-to-pay");
+      socket.off("order-state-changed");
       socket.disconnect();
     };
   }, [currentUser]);
