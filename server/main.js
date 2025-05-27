@@ -23,7 +23,7 @@ import axios from "axios";
 const app = express();
 const server = http.createServer(app);
 export const io = new Server(server, {
-    cors: { origin: "http://localhost:5173",methods: ["GET", "POST"] }
+    cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] }
 });
 
 app.use(cors({
@@ -58,6 +58,11 @@ io.on("connection", (socket) => {
     console.log("Usuario conectado a socket.io");
     socket.on("userLoggedIn", async (userID, userRole) => {
         console.log(`userLoggedIn event recibido. userID: ${userID}, userRole: ${userRole}`);
+        if (userRole === 'general') {
+            socket.join(`user_${userID}`);
+        } else if (userRole === 'admin') {
+            socket.join('admin');
+        }
         try {
             let filteredMessages = [];
             const response = await axios.get("http://localhost:3000/message/");
