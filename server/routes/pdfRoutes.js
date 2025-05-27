@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 router.post('/generate-pdf', async (req, res) => {
     const { userName, userMatricula, pago, userOrderID, medicamentos, tipoPago } = req.body;
 
+
     try {
         let templateFile = '';  // Determinar la plantilla según el tipo de pago
         if (tipoPago === 'ventanilla') {
@@ -33,11 +34,16 @@ router.post('/generate-pdf', async (req, res) => {
         const firstPage = pdfDoc.getPages()[0];
 
         // Agregar datos al PDF
-        firstPage.drawText(`${userName}`, {x: 110, y: 653, size: 11});
+        firstPage.drawText(`${userName}`, { x: 110, y: 653, size: 11 });
         firstPage.drawText(`${userMatricula}`, { x: 125, y: 595, size: 11 });
         firstPage.drawText(`${userOrderID}`, { x: 146, y: 565, size: 11 });
         firstPage.drawText(`${pago}`, { x: 145, y: 128, size: 11 });
-        firstPage.drawText(`${medicamentos.join(', ')}`, { x: 72, y: 500, size: 11 });
+        let medicamentosTexto = "No hay medicamentos";
+        if (Array.isArray(medicamentos)) {
+            medicamentosTexto = medicamentos.map(med => `${med.nombre} (${med.flavor})`).join('\n');
+        }
+        firstPage.drawText(medicamentosTexto, { x: 72, y: 500, size: 11 });
+        //firstPage.drawText(`${medicamentos.join(', ')}`, { x: 72, y: 500, size: 11 }); //medicamentos.join(', ')
 
         // Guardar el nuevo PDF con nombres distintos según el tipo de pago
         const outputFile = tipoPago === 'ventanilla' ? `recibo_ventanilla_${userMatricula}.pdf` : `recibo_transferencia_${userMatricula}.pdf`;

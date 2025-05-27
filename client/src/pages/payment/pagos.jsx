@@ -8,7 +8,7 @@ const handlePayment = async (tipoPago, orderData) => {
     return;
   }
 
-  const { user_id, username, order_id, medicamentos } = orderData;
+  const { user_id, nombre_usuario, order_id, medicamentos } = orderData;
   const total = medicamentos
     .reduce((sum, m) => sum + parseFloat(m.precio ?? 0), 0)
     .toFixed(2);
@@ -17,7 +17,7 @@ const handlePayment = async (tipoPago, orderData) => {
     const response = await axios.post(
       "http://localhost:3000/pdf/generate-pdf",
       {
-        userName:      username,
+        userName:      nombre_usuario,
         userMatricula: user_id,
         pago:          `$${total}`,
         userOrderID:   order_id,
