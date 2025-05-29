@@ -2,13 +2,25 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const fetchCurrentUser = async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/user/current");
+    console.log("Usuario actual:", response.data);
+    return response.data.matricula;
+  } catch (error) {
+    console.error("Error al obtener la matrícula:", error);
+    return "Sin matrícula";
+  }
+};
+
 const handlePayment = async (tipoPago, orderData) => {
   if (!orderData) {
     alert("Error: No se han recibido los datos del pedido.");
     return;
   }
 
-  const { user_id, username, order_id, medicamentos } = orderData;
+  //const { user_id, username, order_id, medicamentos } = orderData;
+  const { user_id, username, matricula, order_id, medicamentos } = orderData;
   const total = medicamentos
     .reduce((sum, m) => sum + parseFloat(m.precio ?? 0), 0)
     .toFixed(2);
@@ -27,6 +39,7 @@ const handlePayment = async (tipoPago, orderData) => {
       { responseType: "arraybuffer" }
     );
     console.log("Username:", orderData.username);
+    console.log("matricula:", orderData.matricula);
 
 
     const blob = new Blob([response.data], { type: "application/pdf" });
@@ -45,6 +58,20 @@ const handlePayment = async (tipoPago, orderData) => {
   }
 };
 
+const fetchUserDetails = async (userId) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/user/get_user/${userId}`);
+    console.log("Respuesta del backend:", response.data);
+    return {
+      username: response.data.user.name_,
+      matricula: response.data.user.matricula
+    };
+  } catch (error) {
+    console.error("Error al obtener los datos del usuario:", error);
+    return { username: "Desconocido", matricula: "Sin matrícula" };
+  }
+};
+
 const CardPaymentForm = () => {
   const { orderId } = useParams();
   const navigate    = useNavigate();
@@ -52,23 +79,28 @@ const CardPaymentForm = () => {
   const [paymentMethod, setPaymentMethod] = useState("ventanilla");
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const { data } = await axios.get(
-          `http://localhost:3000/order/${orderId}`
-        );
-        if (data.success) {
-          console.log("Datos completos de la orden recibidos:", data);
-          setOrderData(data.order);
-        } else {
-          console.error("Orden no encontrada");
-        }
-      } catch (err) {
-        console.error("Error al obtener la orden:", err);
+  const fetchOrder = async () => {
+    try {
+      const { data } = await axios.get(`http://localhost:3000/order/${orderId}`);
+      if (data.success) {
+        console.log("Datos completos de la orden recibidos:", data);
+
+        const userDetails = await fetchUserDetails(data.order.user_id);
+        setOrderData({
+          ...data.order,
+          username: userDetails.username,
+          matricula: userDetails.matricula
+        });
+      } else {
+        console.error("Orden no encontrada");
       }
-    };
-    fetchOrder();
-  }, [orderId]);
+    } catch (err) {
+      console.error("Error al obtener la orden:", err);
+    }
+  };
+
+  fetchOrder();
+}, [orderId]);
 
   if (!orderData) {
     return (

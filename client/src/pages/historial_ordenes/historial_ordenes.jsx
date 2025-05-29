@@ -135,7 +135,7 @@ const HistorialOrdenes = () => {
                   className="border-b border-gray-200 hover:bg-gray-50 transition duration-300"
                 >
                   <td className="py-3 px-6 text-left">{order.order_id}</td>
-                  <td className="py-3 px-6 text-left">${order.amount || "0.00"}</td>
+                  <td className="py-3 px-6 text-left">${order.amount || "-.--"}</td>
                   <td className="py-3 px-6 text-left">{order.order_date}</td>
                   <td className="py-3 px-6 text-left">{order.user_name || "Cliente N/D"}</td>
                   <td className="py-3 px-6 text-left">
