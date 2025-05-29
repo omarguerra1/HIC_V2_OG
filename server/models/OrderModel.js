@@ -36,7 +36,7 @@ const OrderModel = db.define('order', {
 }, {
     timestamps: true,
 });
-// 1 Order → N Medicamentos (por prescription_id)
+
 OrderModel.hasMany(MedicamentoModel, {
   foreignKey: 'prescription_id',
   sourceKey:  'prescription_id',

@@ -8,7 +8,7 @@ const handlePayment = async (tipoPago, orderData) => {
     return;
   }
 
-  const { user_id, nombre_usuario, order_id, medicamentos } = orderData;
+  const { user_id, username, order_id, medicamentos } = orderData;
   const total = medicamentos
     .reduce((sum, m) => sum + parseFloat(m.precio ?? 0), 0)
     .toFixed(2);
@@ -17,7 +17,7 @@ const handlePayment = async (tipoPago, orderData) => {
     const response = await axios.post(
       "http://localhost:3000/pdf/generate-pdf",
       {
-        userName:      nombre_usuario,
+        userName:      username,
         userMatricula: user_id,
         pago:          `$${total}`,
         userOrderID:   order_id,
@@ -26,6 +26,8 @@ const handlePayment = async (tipoPago, orderData) => {
       },
       { responseType: "arraybuffer" }
     );
+    console.log("Username:", orderData.username);
+
 
     const blob = new Blob([response.data], { type: "application/pdf" });
     const url  = window.URL.createObjectURL(blob);
@@ -56,6 +58,7 @@ const CardPaymentForm = () => {
           `http://localhost:3000/order/${orderId}`
         );
         if (data.success) {
+          console.log("Datos completos de la orden recibidos:", data);
           setOrderData(data.order);
         } else {
           console.error("Orden no encontrada");

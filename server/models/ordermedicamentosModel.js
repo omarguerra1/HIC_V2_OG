@@ -32,7 +32,7 @@ const ordermedicamentosModel = db.define('order_medicamentos', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-        precio: {                                 // ← Nuevo campo
+        precio: {                                 
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0.00

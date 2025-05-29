@@ -39,7 +39,7 @@ app.use("/message", messageRoutes);
 app.use('/prescriptions', prescriptionsRoutes);
 app.use("/medicines", medicineRoutes);
 app.use("/historial_pagos", HistorialPagosRoutes);
-app.use('/pdf', pdfRoutes); // Registrar la ruta
+app.use('/pdf', pdfRoutes); 
 app.use("/order_medicamentos", ordermedicamentosRoutes);
 app.use("/notifications", notificationRoutes);
 

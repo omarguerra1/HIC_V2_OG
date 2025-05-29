@@ -28,24 +28,21 @@ const OrderTracking = () => {
   useEffect(() => {
     const fetchUserOrders = async () => {
       try {
-        // 1) Obtener user_id (ajusta según tu login)
         const usuario = JSON.parse(sessionStorage.getItem('usuarioActual'));
         if (!usuario) throw new Error('Usuario no autenticado');
         const user_id = usuario.user_id;
 
-        // 2) Llamar al endpoint CORRECTO (/order) y enviar user_id
         const { data } = await axios.get(
-          'http://localhost:3000/order',      // ← singular
+          'http://localhost:3000/order',      //  singular
           {
             params: {
               page: 1,
               limit: 100,
-              user_id                    // ← para que el backend filtre
+              user_id                    //  para que el backend filtre
             }
           }
         );
 
-        // 3) Separar según estado de pago
         const inProcess = data.orders.filter(o => o.estado_pago === 'Sin Pagar');
         const paid = data.orders.filter(o => o.estado_pago === 'Pagada');
         setOrders({ inProcess, paid });

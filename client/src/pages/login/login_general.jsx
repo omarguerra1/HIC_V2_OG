@@ -76,7 +76,7 @@ const LoginGeneral = () => {
             </div>
             <form onSubmit={(e) => {
                 e.preventDefault();
-                loginGeneral();  // Llamar a la función loginGeneral
+                loginGeneral();  
             }} className="space-y-4">
                 <div className="">
                     <label className="block mb-1 text-sm font-medium text-gray-700">Matricula</label>

@@ -31,7 +31,7 @@ const PrescriptionModel = db.define('prescription', {
     upload_date: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-    },//edtion from here
+    },//edite aqui
     nombre_completo: {
         type: DataTypes.STRING(50),
         allowNull: false,

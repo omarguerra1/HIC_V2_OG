@@ -37,10 +37,11 @@ export const getAllOrders = async (req, res) => {
       const total = meds.reduce((sum, m) => sum + parseFloat(m.precio || 0), 0);
       return {
         order_id: o.order_id,
-        user_id: o.user_id,              // ← lo añadimos
+        user_id: o.user_id,              
         state: o.state,
         estado_pago: o.estado_pago,
         order_date: o.order_date,
+        delivery_schedule: o.delivery_schedule,
         total,
       };
     });
@@ -108,15 +109,13 @@ export const getOneOrder = async (req, res) => {
 };
 
 export const createOrder = async (req, res) => {
-  const { user_id, prescription_id } = req.body; // ahora debes incluir prescription_id en el body
+  const { user_id, prescription_id } = req.body; 
 
   try {
-    // Crear el pedido
     const newOrder = await OrderModel.create({
       user_id,
       prescription_id,
     });
-    // 2) Notificar al usuario que puede pagar
     await NotificationModel.create({
       user_id: newOrder.user_id,
       message: `Tu pedido ${newOrder.order_id} ha sido aprobado y puedes proceder a pagarlo.`,
@@ -126,7 +125,6 @@ export const createOrder = async (req, res) => {
         orderId: newOrder.order_id,
         message: "Tu pedido ha sido aprobado y puedes proceder a pagarlo"
       });
-    // 3) (Opcional) Notificar a los admins
     const admins = await UserModel.findAll({ where: { role: 'hic_admin' } });
     const adminMsg = `Se creó nueva orden #${newOrder.order_id} de usuario ${newOrder.user_id}.`;
     await Promise.all(
@@ -157,7 +155,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// Actualizar el estado de un pedido
 export const updateOrder = async (req, res) => {
   const { order_id } = req.params;
   try {
@@ -212,7 +209,6 @@ export const updateOrder = async (req, res) => {
         newState: order.state,
         timestamp: new Date(),
       });*/
-      // 4) Si se actualizó el estado de preparación/entrega, notifica al user dueño
       res.status(200).json({
         message: "Pedido actualizado",
         order: updatedOrder,
@@ -224,7 +220,7 @@ export const updateOrder = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-// Eliminar un pedido
+
 export const deleteOrder = async (req, res) => {
   try {
     const deleted = await OrderModel.destroy({

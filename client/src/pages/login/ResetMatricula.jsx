@@ -1,6 +1,6 @@
 
 
-import PropTypes from 'prop-types'; // ⬅️ importa PropTypes
+import PropTypes from 'prop-types'; 
 
 const ResetMatricula = ({ onClose }) => {
     return (
@@ -27,7 +27,7 @@ const ResetMatricula = ({ onClose }) => {
     );
 };
 
-// ✅ Validación de props con PropTypes
+
 ResetMatricula.propTypes = {
     onClose: PropTypes.func.isRequired
 };

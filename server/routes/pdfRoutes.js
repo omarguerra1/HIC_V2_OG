@@ -17,9 +17,9 @@ router.post('/generate-pdf', async (req, res) => {
     try {
         let templateFile = '';  // Determinar la plantilla según el tipo de pago
         if (tipoPago === 'ventanilla') {
-            templateFile = 'HOJA_DE_PAGO#1.pdf';  // Sigue siendo la misma
+            templateFile = 'HOJA_DE_PAGO#1.pdf';  
         } else if (tipoPago === 'transferencia') {
-            templateFile = 'HOJA_DE_PAGO#2.pdf';  // Nueva plantilla
+            templateFile = 'HOJA_DE_PAGO#2.pdf';  
         } else {
             return res.status(400).json({ success: false, message: "Tipo de pago inválido" });
         }
@@ -50,7 +50,6 @@ router.post('/generate-pdf', async (req, res) => {
         const outputPath = path.join(__dirname, '..', 'uploads', outputFile);
         fs.writeFileSync(outputPath, await pdfDoc.save());
 
-        // **Enviar el archivo al frontend**
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=${outputFile}`);
         res.send(Buffer.from(await pdfDoc.save()));

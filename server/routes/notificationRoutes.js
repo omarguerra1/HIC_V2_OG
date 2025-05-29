@@ -8,13 +8,13 @@ import {
 
 const router = express.Router();
 
-// Listar notificaciones de un usuario
+
 router.get("/:user_id", getNotificationsByUser);
 
-// Marcar una notificación como leída
+
 router.put("/read/:id", markAsRead);
 
-// (Opcional) Crear notificación manualmente
+
 router.post("/", createNotification);
 
 export default router;

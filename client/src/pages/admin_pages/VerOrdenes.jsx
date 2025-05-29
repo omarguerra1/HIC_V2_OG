@@ -11,16 +11,24 @@ const VerOrdenes = () => {
   const [orderMsgOpen, setOrderMsg] = useState(false);
   const [updatedState, setUpdatedState] = useState("");
   const [updatedDelivery, setUpdatedDelivery] = useState("");
+  const [updatedPayment, setUpdatedPayment] = useState(foundOrder?.is_paid || false);
 
   useEffect(() => {
     getOrders();
-  }, [page]);
+
+    if (foundOrder) {
+      setUpdatedPayment(foundOrder.is_paid);
+      setUpdatedDelivery(foundOrder.delivery_schedule ? new Date(foundOrder.delivery_schedule).toISOString().split("T")[0] : "");
+
+    }
+  }, [page, foundOrder]);
 
   const getOrders = async () => {
     try {
       const response = await axios.get("http://localhost:3000/order/", {
         params: { page }
       });
+      console.log("Órdenes recibidas:", response.data.orders);
       const ordersWithNames = await Promise.all(response.data.orders.map(async (order) => {
         const patientDetails = await getPatientName(order.user_id);
         return { ...order, patient_name: patientDetails ? patientDetails.user.name_ : "Desconocido" };
@@ -29,7 +37,7 @@ const VerOrdenes = () => {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       alert("No se pudo obtener la informacion de las ordenes");
-      console.log("Error al obtener ordenes",error);
+      console.log("Error al obtener ordenes", error);
     }
   };
 
@@ -74,23 +82,30 @@ const VerOrdenes = () => {
   };
 
   const handleSaveChanges = async (order_id, order) => {
+    if (!updatedDelivery || isNaN(new Date(updatedDelivery).getTime())) {
+      alert("Por favor ingrese una fecha de entrega válida");
+      return;
+    }
+
     const updatedOrder = {
       ...order,
       state: updatedState,
-      delivery_schedule: new Date(updatedDelivery).toISOString()
+      delivery_schedule: updatedDelivery ? new Date(updatedDelivery).toISOString() : null,
+      estado_pago: updatedPayment 
     };
+
     try {
       const response = await axios.put(`http://localhost:3000/order/update/${order_id}`, updatedOrder);
       if (response.data.success) {
         alert("Orden actualizada");
         setOrders(prevOrders => prevOrders.map(o =>
-          o.order_id === order_id ? { ...o, state: updatedState, delivery_schedule: updatedOrder.delivery_schedule } : o
+          o.order_id === order_id ? { ...o, state: updatedState, delivery_schedule: updatedOrder.delivery_schedule, is_paid: updatedPayment } : o
         ));
         setOrderMsg(false);
       }
     } catch (error) {
       alert("Error al actualizar pedido");
-      console.log("Error : ",error);
+      console.log("Error : ", error);
     }
   };
 
@@ -151,8 +166,12 @@ const VerOrdenes = () => {
         <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full'>
           <div className="relative top-1/4 mx-auto p-5 border w-1/2 shadow-lg rounded-md bg-white">
             <button
-              onClick={handleOrderMsg}
-              className="absolute top-0 right-0 m-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+              onClick={() => {
+                handleOrderMsg();
+                window.location.reload();
+              }}
+              className="absolute top-0 right-0 m-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+            >
               Aceptar
             </button>
             {foundOrder && (
@@ -174,9 +193,17 @@ const VerOrdenes = () => {
                     <option value="Cancelada">Cancelada</option>
                   </select>
                 </p>
+                <select
+                  value={updatedPayment}
+                  onChange={(e) => setUpdatedPayment(e.target.value)}
+                  className="p-2 border-gray-300 rounded-md bg-white"
+                >
+                  <option value="sin pagar">Sin pagar</option>
+                  <option value="pagada">Pagada</option>
+                </select>
                 <p><strong>Fecha de pedido: </strong>{foundOrder.order_date}</p>
                 <p className="my-2">
-                  <strong>Fecha de entrega: </strong>
+                  <strong>Fecha de entrega: </strong>{foundOrder.delivery_schedule}
                   <input
                     type="date"
                     value={updatedDelivery}
@@ -187,7 +214,7 @@ const VerOrdenes = () => {
                 <button
                   onClick={() => {
                     handleSaveChanges(foundOrder.order_id, foundOrder);
-                    window.location.reload();
+                    //window.location.reload();
                   }}
                   className="mt-4 p-2 bg-green-500 text-white rounded-md hover:bg-green-700 transition"
                 >

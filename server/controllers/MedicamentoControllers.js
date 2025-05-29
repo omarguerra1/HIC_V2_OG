@@ -25,7 +25,7 @@ export const getMedicamento = async (req, res) => {
     }
 };
 export const createMedicamento = async (req, res) => {
-    console.log("Datos recibidos en backend:", req.body);  // ✅ Imprime lo que llega desde el frontend
+    console.log("Datos recibidos en backend:", req.body);  
     const { nombre, flavor, dosis, frecuencia, prescription_id, precio } = req.body;
 
     try {

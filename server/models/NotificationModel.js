@@ -20,7 +20,7 @@ const NotificationModel = db.define("notification", {
     defaultValue: false
   }
 }, {
-  tableName: "notifications",   // por defecto Sequelize pluraliza "notification"
+  tableName: "notifications",   
   timestamps: true
 });
 

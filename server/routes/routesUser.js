@@ -7,6 +7,6 @@ router.get('/', getAllUsers);
 router.post('/register', createUser);
 router.put('/update/:user_id', updateUser);
 router.get('/get_user/:user_id', getUser);
-router.post('/login', loginUser);  // Ruta para login
+router.post('/login', loginUser);  
 
 export default router;

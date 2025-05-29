@@ -27,7 +27,7 @@ const MedicamentoModel = db.define('medicamentos', {
         type: DataTypes.STRING(50),
         allowNull: false,
     },
-    precio: {                                 // ← Nuevo campo
+    precio: {                                 
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0.00

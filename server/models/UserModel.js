@@ -1,5 +1,5 @@
 import db from "../database/db.js"; // Conexión a la base de datos
-import { DataTypes, Sequelize } from "sequelize"; // Asegúrate de importar Sequelize
+import { DataTypes, Sequelize } from "sequelize"; 
 import OrderModel from "./OrderModel.js"
 
 const UserModel = db.define('users', {
@@ -26,15 +26,15 @@ const UserModel = db.define('users', {
     },
     role: {
         type: DataTypes.ENUM('general', 'hic_admin'),
-        defaultValue: 'general', // Por defecto, los nuevos usuarios son generales
+        defaultValue: 'general', 
     },
     createdAt: {
         type: DataTypes.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'), // Usa Sequelize.literal para obtener el timestamp actual
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'), 
     },
     updatedAt: {
         type: DataTypes.DATE,
-        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP'), // Se actualiza automáticamente cuando se hace un update
+        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP'), 
     }
 }, {
     timestamps: true, // Esto habilita los campos createdAt y updatedAt
